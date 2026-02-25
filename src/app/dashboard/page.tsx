@@ -5,6 +5,8 @@ import Sidebar from '@/components/Layout/Sidebar';
 import Header from '@/components/Layout/Header';
 import { getTodayStats, getRecentOrders, getLowStockItems } from '@/lib/data';
 import { Order, InventoryItem } from '@/types/database';
+import SalesChart from '@/components/Dashboard/SalesChart';
+import { motion } from 'framer-motion';
 import {
     TrendingUp,
     ShoppingBag,
@@ -85,17 +87,34 @@ export default function Dashboard() {
                 <Header />
                 <main className="flex-1 overflow-y-auto p-4 md:p-6">
                     {/* Page Title */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 animate-fade-in">
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8"
+                    >
                         <div>
                             <h1 className="text-2xl font-black tracking-tight font-display">Good day! ☕</h1>
                             <p className="text-slate-500 text-sm mt-1">Here&apos;s what&apos;s happening at M Coffee Shop today.</p>
                         </div>
-                    </div>
+                    </motion.div>
 
                     {/* Stat Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8 stagger-children">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ staggerChildren: 0.1 }}
+                        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8"
+                    >
                         {statCards.map((stat, idx) => (
-                            <div key={stat.name} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: `${idx * 80}ms` }}>
+                            <motion.div
+                                key={stat.name}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                whileHover={{ y: -4, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)" }}
+                                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm transition-all"
+                            >
                                 <div className="flex items-center justify-between mb-4">
                                     <div className={clsx("size-11 rounded-xl flex items-center justify-center", stat.bg)}>
                                         <stat.icon size={20} className={stat.text} />
@@ -103,14 +122,38 @@ export default function Dashboard() {
                                 </div>
                                 <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{stat.name}</p>
                                 <p className="text-2xl font-black tracking-tight">{mounted ? stat.value : '—'}</p>
-                            </div>
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
+
+                    {/* Sales Overview Chart */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm mb-6"
+                    >
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="size-9 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+                                <Activity size={16} className="text-emerald-500" />
+                            </div>
+                            <div>
+                                <h2 className="text-base font-black">Sales Overview</h2>
+                                <p className="text-xs text-slate-500">Hourly revenue from today</p>
+                            </div>
+                        </div>
+                        <SalesChart />
+                    </motion.div>
 
                     {/* Two-column layout */}
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {/* Recent Transactions */}
-                        <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up overflow-hidden">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                            className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden"
+                        >
                             <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="size-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
@@ -151,10 +194,15 @@ export default function Dashboard() {
                                     ))
                                 )}
                             </div>
-                        </div>
+                        </motion.div>
 
                         {/* Inventory Alerts */}
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm animate-slide-up overflow-hidden" style={{ animationDelay: '100ms' }}>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, delay: 0.6 }}
+                            className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden"
+                        >
                             <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                                 <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center">
                                     <AlertTriangle size={16} className="text-primary" />
@@ -186,7 +234,7 @@ export default function Dashboard() {
                                     ))
                                 )}
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </main>
             </div>

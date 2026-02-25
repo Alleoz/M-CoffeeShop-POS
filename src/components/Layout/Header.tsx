@@ -1,13 +1,16 @@
 "use client";
 
-import { Bell, Search, Clock, Menu } from 'lucide-react';
+import { Bell, Search, Clock, Menu, Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/store/useSidebarStore';
+import { useTheme } from 'next-themes';
 
 export default function Header() {
     const [currentTime, setCurrentTime] = useState('');
     const [currentDate, setCurrentDate] = useState('');
+    const [mounted, setMounted] = useState(false);
     const { toggle } = useSidebarStore();
+    const { theme, setTheme } = useTheme();
 
     useEffect(() => {
         const update = () => {
@@ -17,6 +20,7 @@ export default function Header() {
         };
         update();
         const interval = setInterval(update, 1000);
+        setMounted(true);
         return () => clearInterval(interval);
     }, []);
 
@@ -52,6 +56,15 @@ export default function Header() {
                 </div>
 
                 <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 hidden sm:block" />
+
+                {/* Theme Toggle */}
+                <button
+                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                    className="size-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                >
+                    {mounted && (theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />)}
+                    {!mounted && <Sun size={18} />}
+                </button>
 
                 {/* Notification Bell */}
                 <button className="size-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all relative">

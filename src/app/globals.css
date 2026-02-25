@@ -37,13 +37,11 @@
   --card-border: #e2e8f0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f1523;
-    --foreground: #f1f5f9;
-    --card-bg: #0f172a;
-    --card-border: #1e293b;
-  }
+.dark {
+  --background: #0f1523;
+  --foreground: #f1f5f9;
+  --card-bg: #0f172a;
+  --card-border: #1e293b;
 }
 
 /* ─────────── Base Styles ─────────── */
@@ -296,10 +294,8 @@ body {
   -webkit-backdrop-filter: blur(16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  .glass {
-    background: rgba(15, 21, 35, 0.75);
-  }
+.dark .glass {
+  background: rgba(15, 21, 35, 0.75);
 }
 
 .card-hover {

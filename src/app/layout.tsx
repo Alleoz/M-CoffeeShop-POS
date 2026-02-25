@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AuthGuard from "@/components/Auth/AuthGuard";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
     title: "M Coffee Shop POS",
@@ -37,10 +38,17 @@ export default function RootLayout({
                 <link rel="apple-touch-icon" href="/icons/icon.svg" />
             </head>
             <body className="antialiased" suppressHydrationWarning>
-                <AuthGuard>
-                    {children}
-                </AuthGuard>
-                <ServiceWorkerRegistration />
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    <AuthGuard>
+                        {children}
+                    </AuthGuard>
+                    <ServiceWorkerRegistration />
+                </ThemeProvider>
             </body>
         </html>
     );
