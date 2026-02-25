@@ -236,10 +236,10 @@ export default function POSPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-5 w-full stagger-children">
                                 {[
-                                    { id: 'Walk-in', icon: User, label: 'Walk-in', desc: 'Quick counter order', gradient: 'from-blue-500 to-indigo-600' },
+                                    { id: 'Walk-in', icon: User, label: 'Walk-in', desc: 'Quick counter order', gradient: 'from-primary to-blue-600' },
                                     { id: 'Dine-in', icon: Store, label: 'Dine-in', desc: 'Eating in the shop', gradient: 'from-emerald-500 to-teal-600' },
-                                    { id: 'Takeout', icon: MapPin, label: 'Takeout', desc: 'Pack to go', gradient: 'from-amber-500 to-orange-600' },
-                                    { id: 'Delivery', icon: Bike, label: 'Delivery', desc: 'Rider pickup', gradient: 'from-violet-500 to-purple-600' },
+                                    { id: 'Takeout', icon: MapPin, label: 'Takeout', desc: 'Pack to go', gradient: 'from-indigo-500 to-violet-600' },
+                                    { id: 'Delivery', icon: Bike, label: 'Delivery', desc: 'Rider pickup', gradient: 'from-rose-500 to-pink-600' },
                                 ].map((type, idx) => (
                                     <button
                                         key={type.id}
@@ -347,7 +347,7 @@ export default function POSPage() {
                                                 style={{ animationDelay: `${(idx % 8) * 40}ms` }}
                                             >
                                                 {inCart && (
-                                                    <div className="absolute top-3 right-3 size-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-black shadow-md">
+                                                    <div className="absolute top-3 right-3 size-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black shadow-md">
                                                         {inCart.quantity}
                                                     </div>
                                                 )}
