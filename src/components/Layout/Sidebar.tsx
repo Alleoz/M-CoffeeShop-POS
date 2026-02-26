@@ -20,6 +20,7 @@ import {
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
     { name: 'New Order', href: '/pos', icon: ShoppingCart },
+    { name: 'Products', href: '/products', icon: Coffee },
     { name: 'Barista KDS', href: '/barista', icon: ChefHat },
     { name: 'Inventory', href: '/inventory', icon: Package },
     { name: 'Reports', href: '/reports', icon: Receipt },

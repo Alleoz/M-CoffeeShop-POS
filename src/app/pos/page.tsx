@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Sidebar from '@/components/Layout/Sidebar';
 import Header from '@/components/Layout/Header';
 import Modal from '@/components/UI/Modal';
+import ProductImage from '@/components/UI/ProductImage';
 import { useCartStore } from '@/store/useCartStore';
 import { getProducts, createOrder } from '@/lib/data';
 import { Product, Order } from '@/types/database';
@@ -351,9 +352,12 @@ export default function POSPage() {
                                                         {inCart.quantity}
                                                     </div>
                                                 )}
-                                                <div className="aspect-square bg-slate-50 dark:bg-slate-800 rounded-xl mb-3 flex items-center justify-center text-4xl group-hover:scale-105 transition-transform">
-                                                    {p.image}
-                                                </div>
+                                                <ProductImage
+                                                    image={p.image}
+                                                    name={p.name}
+                                                    size="md"
+                                                    className="aspect-square bg-slate-50 dark:bg-slate-800 rounded-xl mb-3 group-hover:scale-105 transition-transform"
+                                                />
                                                 <h3 className="font-bold text-sm mb-1 truncate">{p.name}</h3>
                                                 <p className="text-primary font-black text-lg">₱{p.price.toFixed(0)}</p>
                                             </div>
@@ -440,9 +444,12 @@ export default function POSPage() {
                                     ) : (
                                         cart.map((item) => (
                                             <div key={item.id} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 animate-fade-in">
-                                                <div className="size-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-xl border border-slate-200 dark:border-slate-700 shrink-0">
-                                                    {item.image}
-                                                </div>
+                                                <ProductImage
+                                                    image={item.image}
+                                                    name={item.name}
+                                                    size="sm"
+                                                    className="size-10 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shrink-0"
+                                                />
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-bold text-xs truncate">{item.name}</p>
                                                     <p className="text-primary font-black text-xs">₱{(item.price * item.quantity).toFixed(2)}</p>
