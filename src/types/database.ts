@@ -1,5 +1,10 @@
 // Database types matching Supabase schema
 
+export interface ProductSize {
+    name: string;   // e.g. "16oz", "22oz"
+    price: number;
+}
+
 export interface Product {
     id: string;
     name: string;
@@ -8,6 +13,7 @@ export interface Product {
     image: string;
     description?: string;
     is_available: boolean;
+    sizes?: ProductSize[] | null;
     created_at: string;
 }
 

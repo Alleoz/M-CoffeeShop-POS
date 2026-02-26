@@ -3,27 +3,34 @@
 import { useTheme } from "next-themes";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useEffect, useState } from "react";
-
-const data = [
-    { name: "6 AM", sales: 120 },
-    { name: "8 AM", sales: 450 },
-    { name: "10 AM", sales: 800 },
-    { name: "12 PM", sales: 1200 },
-    { name: "2 PM", sales: 950 },
-    { name: "4 PM", sales: 1100 },
-    { name: "6 PM", sales: 1560 },
-];
+import { getHourlySales } from "@/lib/data";
 
 export default function SalesChart() {
     const { theme, systemTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const [data, setData] = useState<{ name: string; sales: number }[]>([]);
 
-    useEffect(() => setMounted(true), []);
+    useEffect(() => {
+        setMounted(true);
+        const loadData = async () => {
+            const hourlySales = await getHourlySales();
+            setData(hourlySales);
+        };
+        loadData();
+    }, []);
 
     if (!mounted) return <div className="h-[300px] w-full mt-4 flex items-center justify-center text-slate-400">Loading chart...</div>;
 
     const currentTheme = theme === "system" ? systemTheme : theme;
     const isDark = currentTheme === "dark";
+
+    if (data.length === 0) {
+        return (
+            <div className="h-[300px] w-full mt-4 flex items-center justify-center text-text-tertiary text-sm">
+                No sales data for today yet.
+            </div>
+        );
+    }
 
     return (
         <div className="h-[300px] w-full mt-4">
@@ -58,6 +65,7 @@ export default function SalesChart() {
                             boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
                         }}
                         itemStyle={{ color: "#4276fa", fontWeight: "bold" }}
+                        formatter={(value: string | number | (string | number)[] | undefined) => [`₱${Number(value ?? 0).toLocaleString()}`, 'Revenue']}
                     />
                     <Area type="monotone" dataKey="sales" stroke="#4276fa" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
                 </AreaChart>

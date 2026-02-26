@@ -29,8 +29,6 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-const categories = ['All', 'Espresso', 'Frappe', 'Pastry', 'Non-Coffee', 'Tea'];
-
 export default function POSPage() {
     const [step, setStep] = useState(1);
     const [products, setProducts] = useState<Product[]>([]);
@@ -43,6 +41,7 @@ export default function POSPage() {
     const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
     const [mounted, setMounted] = useState(false);
     const [processing, setProcessing] = useState(false);
+    const [sizePickerProduct, setSizePickerProduct] = useState<Product | null>(null);
 
     const {
         customerType, setCustomerType,
@@ -60,6 +59,12 @@ export default function POSPage() {
         };
         loadProducts();
     }, []);
+
+    // Derive categories dynamically from products
+    const categories = useMemo(() => {
+        const cats = new Set(products.map(p => p.category));
+        return ['All', ...Array.from(cats).sort()];
+    }, [products]);
 
     const filteredProducts = useMemo(() => {
         return products.filter(p => {
@@ -79,6 +84,37 @@ export default function POSPage() {
         }
     };
 
+    const handleProductClick = (product: Product) => {
+        if (product.sizes && product.sizes.length > 0) {
+            // Show size picker
+            setSizePickerProduct(product);
+        } else {
+            // Add directly to cart (no sizes)
+            addItem({
+                id: product.id,
+                productId: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: 1,
+                image: product.image,
+            });
+        }
+    };
+
+    const handleSizeSelect = (product: Product, sizeName: string, sizePrice: number) => {
+        const cartId = `${product.id}-${sizeName}`;
+        addItem({
+            id: cartId,
+            productId: product.id,
+            name: `${product.name} (${sizeName})`,
+            price: sizePrice,
+            quantity: 1,
+            image: product.image,
+            size: sizeName,
+        });
+        setSizePickerProduct(null);
+    };
+
     const subtotal = getSubtotal();
     const total = getTotal();
     const change = parseFloat(amountPaid || '0') - total;
@@ -92,7 +128,7 @@ export default function POSPage() {
                 customer_type: customerType,
                 table_no: tableNo || null,
                 items: cart.map(item => ({
-                    product_id: item.id,
+                    product_id: item.productId,
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,
@@ -348,22 +384,25 @@ export default function POSPage() {
                                 {/* Product grid */}
                                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3 md:gap-4 overflow-y-auto pr-2 flex-1 stagger-children pb-20 xl:pb-0">
                                     {filteredProducts.map((p, idx) => {
-                                        const inCart = cart.find(c => c.id === p.id);
+                                        // Check if any size of this product is in cart
+                                        const inCartCount = cart
+                                            .filter(c => c.productId === p.id)
+                                            .reduce((sum, c) => sum + c.quantity, 0);
                                         return (
                                             <div
                                                 key={p.id}
-                                                onClick={() => addItem({ id: p.id, name: p.name, price: p.price, quantity: 1, image: p.image })}
+                                                onClick={() => handleProductClick(p)}
                                                 className={clsx(
                                                     "bg-white border rounded-xl p-4 shadow-card cursor-pointer group card-hover animate-fade-in relative overflow-hidden",
-                                                    inCart
+                                                    inCartCount > 0
                                                         ? "border-primary/50 ring-1 ring-primary/20"
                                                         : "border-border hover:border-primary/40"
                                                 )}
                                                 style={{ animationDelay: `${(idx % 8) * 40}ms` }}
                                             >
-                                                {inCart && (
+                                                {inCartCount > 0 && (
                                                     <div className="absolute top-3 right-3 size-6 rounded-full bg-primary text-text-on-primary flex items-center justify-center text-[10px] font-extrabold shadow-sm">
-                                                        {inCart.quantity}
+                                                        {inCartCount}
                                                     </div>
                                                 )}
                                                 <ProductImage
@@ -373,7 +412,14 @@ export default function POSPage() {
                                                     className="aspect-square bg-bg-muted rounded-lg mb-3 group-hover:scale-105 transition-transform"
                                                 />
                                                 <h3 className="font-bold text-sm mb-1 truncate text-text-primary">{p.name}</h3>
-                                                <p className="text-primary font-extrabold text-lg">₱{p.price.toFixed(0)}</p>
+                                                {p.sizes && p.sizes.length > 0 ? (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <p className="text-primary font-extrabold text-sm">₱{p.sizes[0].price.toFixed(0)}</p>
+                                                        <span className="text-text-tertiary text-[10px] font-bold">- ₱{p.sizes[p.sizes.length - 1].price.toFixed(0)}</span>
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-primary font-extrabold text-lg">₱{p.price.toFixed(0)}</p>
+                                                )}
                                             </div>
                                         );
                                     })}
@@ -414,9 +460,9 @@ export default function POSPage() {
                             {/* Cart Panel */}
                             <div className={clsx(
                                 "flex flex-col bg-white border border-border overflow-hidden shadow-panel",
-                                "xl:w-[340px] xl:relative xl:rounded-2xl xl:animate-slide-right",
+                                "xl:w-[340px] xl:relative xl:rounded-2xl xl:animate-slide-right xl:self-start xl:sticky xl:top-0",
                                 "xl:translate-y-0 xl:opacity-100",
-                                "fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl max-h-[85vh] xl:max-h-none xl:static xl:inset-auto",
+                                "fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl max-h-[85vh] xl:max-h-[calc(100vh-140px)] xl:static xl:inset-auto",
                                 showCart ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 xl:translate-y-0 xl:opacity-100",
                                 "transition-all duration-300 ease-in-out"
                             )}>
@@ -445,7 +491,7 @@ export default function POSPage() {
                                 </div>
 
                                 {/* Cart Items */}
-                                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                                <div className="flex-1 xl:flex-none overflow-y-auto p-4 space-y-3 xl:max-h-[40vh]">
                                     {cart.length === 0 ? (
                                         <div className="h-full flex flex-col items-center justify-center text-center opacity-30 py-16">
                                             <ShoppingCart size={48} className="mb-3" />
@@ -480,7 +526,7 @@ export default function POSPage() {
                                 </div>
 
                                 {/* Cart Footer / Totals */}
-                                <div className="p-4 md:p-5 bg-bg-highlight border-t border-border-light">
+                                <div className="p-4 pb-6 md:p-5 md:pb-7 bg-bg-highlight border-t border-border-light">
                                     <div className="flex items-center justify-between mb-1.5">
                                         <span className="text-text-tertiary text-xs font-bold">Subtotal</span>
                                         <span className="font-bold text-sm text-text-primary">₱{subtotal.toFixed(2)}</span>
@@ -507,6 +553,62 @@ export default function POSPage() {
                     )}
                 </main>
             </div>
+
+            {/* ─── Size Picker Modal ─── */}
+            <Modal isOpen={!!sizePickerProduct} onClose={() => setSizePickerProduct(null)} title="Select Size" maxWidth="max-w-sm">
+                {sizePickerProduct && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3 mb-4">
+                            <ProductImage
+                                image={sizePickerProduct.image}
+                                name={sizePickerProduct.name}
+                                size="sm"
+                                className="size-14 bg-bg-muted rounded-xl border border-border shrink-0"
+                            />
+                            <div>
+                                <h3 className="font-extrabold text-base text-text-primary">{sizePickerProduct.name}</h3>
+                                <p className="text-xs text-text-tertiary">{sizePickerProduct.category}</p>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            {sizePickerProduct.sizes?.map((size) => {
+                                const cartId = `${sizePickerProduct.id}-${size.name}`;
+                                const inCart = cart.find(c => c.id === cartId);
+                                return (
+                                    <button
+                                        key={size.name}
+                                        onClick={() => handleSizeSelect(sizePickerProduct, size.name, size.price)}
+                                        className={clsx(
+                                            "w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:scale-[1.01]",
+                                            inCart
+                                                ? "border-primary bg-primary/5"
+                                                : "border-border hover:border-primary/50"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={clsx(
+                                                "size-10 rounded-lg flex items-center justify-center font-extrabold text-xs",
+                                                inCart ? "bg-primary text-white" : "bg-bg-muted text-text-secondary"
+                                            )}>
+                                                {size.name}
+                                            </div>
+                                            <span className="font-bold text-sm text-text-primary">{size.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            {inCart && (
+                                                <span className="bg-primary/15 text-primary text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                                                    ×{inCart.quantity}
+                                                </span>
+                                            )}
+                                            <span className="font-extrabold text-primary text-lg">₱{size.price.toFixed(0)}</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+            </Modal>
 
             {/* ─── Payment Modal ─── */}
             <Modal isOpen={showPayment} onClose={() => setShowPayment(false)} title="Process Payment" maxWidth="max-w-md">

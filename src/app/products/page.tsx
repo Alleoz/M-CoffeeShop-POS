@@ -7,7 +7,7 @@ import Modal from '@/components/UI/Modal';
 import ProductImage from '@/components/UI/ProductImage';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '@/lib/data';
 import { uploadProductImage, isImageUrl } from '@/lib/storage';
-import { Product } from '@/types/database';
+import { Product, ProductSize } from '@/types/database';
 import {
     Coffee,
     Search,
@@ -45,6 +45,7 @@ export default function ProductsPage() {
     const [formImage, setFormImage] = useState('');
     const [formDescription, setFormDescription] = useState('');
     const [formAvailable, setFormAvailable] = useState(true);
+    const [formSizes, setFormSizes] = useState<ProductSize[]>([]);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -92,6 +93,7 @@ export default function ProductsPage() {
         setFormImage('');
         setFormDescription('');
         setFormAvailable(true);
+        setFormSizes([]);
         setImagePreview(null);
         setImageFile(null);
         setUploadError('');
@@ -152,6 +154,7 @@ export default function ProductsPage() {
                 image: imageUrl || '☕',
                 description: formDescription || undefined,
                 is_available: formAvailable,
+                sizes: formSizes.length > 0 ? formSizes : undefined,
             });
             resetForm();
             setShowAdd(false);
@@ -183,6 +186,7 @@ export default function ProductsPage() {
                 image: imageUrl || editingProduct.image,
                 description: formDescription || undefined,
                 is_available: formAvailable,
+                sizes: formSizes.length > 0 ? formSizes : null,
             });
             resetForm();
             setEditingProduct(null);
@@ -214,6 +218,7 @@ export default function ProductsPage() {
         setFormImage(product.image);
         setFormDescription(product.description || '');
         setFormAvailable(product.is_available);
+        setFormSizes(product.sizes || []);
         // If product already has an image URL, show it as preview
         if (isImageUrl(product.image)) {
             setImagePreview(product.image);
@@ -333,6 +338,59 @@ export default function ProductsPage() {
                         className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
                     />
                 </div>
+            </div>
+
+            {/* Sizes */}
+            <div>
+                <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Size Variants (optional)</label>
+                    <button
+                        type="button"
+                        onClick={() => setFormSizes([...formSizes, { name: '', price: 0 }])}
+                        className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+                    >
+                        <Plus size={12} />
+                        Add Size
+                    </button>
+                </div>
+                {formSizes.length > 0 ? (
+                    <div className="space-y-2">
+                        {formSizes.map((size, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                                <input
+                                    value={size.name}
+                                    onChange={(e) => {
+                                        const updated = [...formSizes];
+                                        updated[idx] = { ...updated[idx], name: e.target.value };
+                                        setFormSizes(updated);
+                                    }}
+                                    placeholder="e.g. 16oz"
+                                    className="flex-1 border border-slate-200 rounded-xl py-2 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                />
+                                <input
+                                    type="number"
+                                    value={size.price || ''}
+                                    onChange={(e) => {
+                                        const updated = [...formSizes];
+                                        updated[idx] = { ...updated[idx], price: parseFloat(e.target.value) || 0 };
+                                        setFormSizes(updated);
+                                    }}
+                                    placeholder="₱ Price"
+                                    className="w-24 border border-slate-200 rounded-xl py-2 px-3 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setFormSizes(formSizes.filter((_, i) => i !== idx))}
+                                    className="size-8 flex items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-[10px] text-slate-400">No sizes — product will use a single base price.</p>
+                )}
             </div>
 
             {/* Description */}
@@ -553,7 +611,12 @@ export default function ProductsPage() {
                                                 </span>
                                             </td>
                                             <td className="px-4 md:px-6 py-4">
-                                                <span className="font-black text-primary">₱{product.price.toFixed(0)}</span>
+                                                <span className="font-black text-primary">
+                                                    {product.sizes && product.sizes.length > 0
+                                                        ? `₱${product.sizes[0].price.toFixed(0)} - ₱${product.sizes[product.sizes.length - 1].price.toFixed(0)}`
+                                                        : `₱${product.price.toFixed(0)}`
+                                                    }
+                                                </span>
                                             </td>
                                             <td className="px-4 md:px-6 py-4">
                                                 <button
@@ -642,7 +705,12 @@ export default function ProductsPage() {
                                     <div className="p-4">
                                         <h3 className="font-bold text-sm mb-1 truncate">{product.name}</h3>
                                         <div className="flex items-center justify-between mb-3">
-                                            <p className="text-primary font-black text-lg">₱{product.price.toFixed(0)}</p>
+                                            <p className="text-primary font-black text-lg">
+                                                {product.sizes && product.sizes.length > 0
+                                                    ? `₱${product.sizes[0].price.toFixed(0)} - ₱${product.sizes[product.sizes.length - 1].price.toFixed(0)}`
+                                                    : `₱${product.price.toFixed(0)}`
+                                                }
+                                            </p>
                                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
                                                 {product.category}
                                             </span>

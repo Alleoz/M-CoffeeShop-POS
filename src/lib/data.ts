@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { Product, Order, InventoryItem, Expense, OrderItem } from '@/types/database';
+import { Product, Order, InventoryItem, Expense, OrderItem, ProductSize } from '@/types/database';
 
 // ─────────── Products ───────────
 export async function getProducts(): Promise<Product[]> {
@@ -16,6 +16,7 @@ export async function getProducts(): Promise<Product[]> {
     return (data || []).map(row => ({
         ...row,
         price: Number(row.price),
+        sizes: row.sizes ? (row.sizes as unknown as ProductSize[]).map(s => ({ ...s, price: Number(s.price) })) : null,
     }));
 }
 
@@ -38,6 +39,7 @@ export async function addProduct(product: Omit<Product, 'id' | 'created_at'>): P
             image: product.image,
             description: product.description || null,
             is_available: product.is_available,
+            sizes: product.sizes || null,
         })
         .select()
         .single();
@@ -47,7 +49,11 @@ export async function addProduct(product: Omit<Product, 'id' | 'created_at'>): P
         return null;
     }
 
-    return { ...data, price: Number(data.price) };
+    return {
+        ...data,
+        price: Number(data.price),
+        sizes: data.sizes ? (data.sizes as unknown as ProductSize[]).map(s => ({ ...s, price: Number(s.price) })) : null,
+    };
 }
 
 export async function updateProduct(id: string, updates: Partial<Product>): Promise<void> {
@@ -335,6 +341,48 @@ export async function getRecentOrders(limit = 10): Promise<Order[]> {
         change: Number(row.change),
         items: (row.items as unknown as OrderItem[]) || [],
     }));
+}
+
+export async function getHourlySales(): Promise<{ name: string; sales: number }[]> {
+    const today = new Date().toISOString().slice(0, 10);
+    const currentHour = new Date().getHours();
+
+    const { data, error } = await supabase
+        .from('orders')
+        .select('total, created_at')
+        .gte('created_at', `${today}T00:00:00`)
+        .lte('created_at', `${today}T23:59:59`)
+        .neq('status', 'Cancelled');
+
+    if (error) {
+        console.error('Error fetching hourly sales:', error);
+        return [];
+    }
+
+    const orders = data || [];
+
+    // Aggregate totals by hour
+    const hourlyMap: Record<number, number> = {};
+    for (const order of orders) {
+        const hour = new Date(order.created_at).getHours();
+        hourlyMap[hour] = (hourlyMap[hour] || 0) + Number(order.total);
+    }
+
+    // Build time labels from 6 AM up to current hour (typical coffee shop hours)
+    const startHour = 6;
+    const endHour = Math.max(startHour, currentHour);
+    const result: { name: string; sales: number }[] = [];
+
+    for (let h = startHour; h <= endHour; h++) {
+        const ampm = h < 12 ? 'AM' : 'PM';
+        const display = h === 0 ? 12 : h > 12 ? h - 12 : h;
+        result.push({
+            name: `${display} ${ampm}`,
+            sales: Math.round(hourlyMap[h] || 0),
+        });
+    }
+
+    return result;
 }
 
 export async function getLowStockItems(): Promise<InventoryItem[]> {

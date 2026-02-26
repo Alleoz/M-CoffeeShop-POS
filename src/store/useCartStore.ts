@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 
 export interface CartItem {
-    id: string;
+    id: string;        // unique key: productId or productId-sizeName
+    productId: string; // original product id
     name: string;
     price: number;
     quantity: number;
     image: string;
+    size?: string;     // e.g. "16oz", "22oz"
 }
 
 interface CartStore {
