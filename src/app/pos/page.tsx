@@ -42,6 +42,7 @@ export default function POSPage() {
     const [amountPaid, setAmountPaid] = useState('');
     const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [processing, setProcessing] = useState(false);
 
     const {
         customerType, setCustomerType,
@@ -52,8 +53,12 @@ export default function POSPage() {
     } = useCartStore();
 
     useEffect(() => {
-        setProducts(getProducts().filter(p => p.is_available));
-        setMounted(true);
+        const loadProducts = async () => {
+            const data = await getProducts();
+            setProducts(data.filter(p => p.is_available));
+            setMounted(true);
+        };
+        loadProducts();
     }, []);
 
     const filteredProducts = useMemo(() => {
@@ -78,31 +83,40 @@ export default function POSPage() {
     const total = getTotal();
     const change = parseFloat(amountPaid || '0') - total;
 
-    const handleProcessPayment = () => {
+    const handleProcessPayment = async () => {
         if (paymentMethod === 'Cash' && change < 0) return;
+        setProcessing(true);
 
-        const order = createOrder({
-            customer_type: customerType,
-            table_no: tableNo || null,
-            items: cart.map(item => ({
-                product_id: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                subtotal: item.price * item.quantity,
-            })),
-            subtotal,
-            tax: 0,
-            total,
-            payment_method: paymentMethod,
-            amount_paid: paymentMethod === 'Cash' ? parseFloat(amountPaid || '0') : total,
-            change: paymentMethod === 'Cash' ? Math.max(0, change) : 0,
-            status: 'Pending',
-        });
+        try {
+            const order = await createOrder({
+                customer_type: customerType,
+                table_no: tableNo || null,
+                items: cart.map(item => ({
+                    product_id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    subtotal: item.price * item.quantity,
+                })),
+                subtotal,
+                tax: 0,
+                total,
+                payment_method: paymentMethod,
+                amount_paid: paymentMethod === 'Cash' ? parseFloat(amountPaid || '0') : total,
+                change: paymentMethod === 'Cash' ? Math.max(0, change) : 0,
+                status: 'Pending',
+            });
 
-        setCompletedOrder(order);
-        setShowPayment(false);
-        clearCart();
+            if (order) {
+                setCompletedOrder(order);
+                setShowPayment(false);
+                clearCart();
+            }
+        } catch (err) {
+            console.error('Payment processing error:', err);
+        } finally {
+            setProcessing(false);
+        }
     };
 
     const handleNewOrder = () => {
@@ -400,9 +414,7 @@ export default function POSPage() {
                             {/* Cart Panel */}
                             <div className={clsx(
                                 "flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl",
-                                // Desktop: fixed width sidebar
                                 "xl:w-[340px] xl:relative xl:rounded-2xl xl:animate-slide-right",
-                                // Tablet/Mobile: slide-up overlay from bottom
                                 "xl:translate-y-0 xl:opacity-100",
                                 "fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl max-h-[85vh] xl:max-h-none xl:static xl:inset-auto",
                                 showCart ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 xl:translate-y-0 xl:opacity-100",
@@ -410,7 +422,6 @@ export default function POSPage() {
                             )}>
                                 {/* Cart Header */}
                                 <div className="p-4 md:p-5 border-b border-slate-100 dark:border-slate-800">
-                                    {/* Drag handle - mobile only */}
                                     <div className="xl:hidden w-10 h-1 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-3" />
                                     <div className="flex items-center justify-between">
                                         <h3 className="font-black text-lg font-display">Cart</h3>
@@ -583,11 +594,20 @@ export default function POSPage() {
                     {/* Process Button */}
                     <button
                         onClick={handleProcessPayment}
-                        disabled={paymentMethod === 'Cash' && (change < 0 || !amountPaid)}
+                        disabled={(paymentMethod === 'Cash' && (change < 0 || !amountPaid)) || processing}
                         className="w-full bg-primary text-white font-black py-4 rounded-xl shadow-lg shadow-primary/25 hover:bg-primary/90 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed"
                     >
-                        <Check size={18} />
-                        Complete Payment
+                        {processing ? (
+                            <>
+                                <Coffee size={18} className="animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            <>
+                                <Check size={18} />
+                                Complete Payment
+                            </>
+                        )}
                     </button>
                 </div>
             </Modal>

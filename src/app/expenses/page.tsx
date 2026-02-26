@@ -31,11 +31,13 @@ export default function ExpensesPage() {
     const [formAmount, setFormAmount] = useState('');
     const [formDescription, setFormDescription] = useState('');
 
-    const refreshExpenses = () => setExpenses(getExpenses());
+    const refreshExpenses = async () => {
+        const data = await getExpenses();
+        setExpenses(data);
+    };
 
     useEffect(() => {
-        refreshExpenses();
-        setMounted(true);
+        refreshExpenses().then(() => setMounted(true));
     }, []);
 
     const totalMonthExpenses = useMemo(() => {
@@ -48,9 +50,9 @@ export default function ExpensesPage() {
         return expenses.filter(e => e.date === today).reduce((sum, e) => sum + e.amount, 0);
     }, [expenses]);
 
-    const handleAddExpense = () => {
+    const handleAddExpense = async () => {
         if (!formCategory || !formAmount || !formDate) return;
-        addExpense({
+        await addExpense({
             date: formDate,
             category: formCategory,
             amount: parseFloat(formAmount),
@@ -61,13 +63,13 @@ export default function ExpensesPage() {
         setFormAmount('');
         setFormDescription('');
         setShowAdd(false);
-        refreshExpenses();
+        await refreshExpenses();
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm('Delete this expense record?')) {
-            deleteExpense(id);
-            refreshExpenses();
+            await deleteExpense(id);
+            await refreshExpenses();
         }
     };
 

@@ -51,11 +51,13 @@ export default function ProductsPage() {
     const [uploadError, setUploadError] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const refreshProducts = () => setProducts(getProducts());
+    const refreshProducts = async () => {
+        const data = await getProducts();
+        setProducts(data);
+    };
 
     useEffect(() => {
-        refreshProducts();
-        setMounted(true);
+        refreshProducts().then(() => setMounted(true));
     }, []);
 
     // Derive unique categories from products
@@ -143,7 +145,7 @@ export default function ProductsPage() {
                 imageUrl = await uploadProductImage(imageFile);
             }
 
-            addProduct({
+            await addProduct({
                 name: formName,
                 price: parseFloat(formPrice) || 0,
                 category: formCategory,
@@ -153,7 +155,7 @@ export default function ProductsPage() {
             });
             resetForm();
             setShowAdd(false);
-            refreshProducts();
+            await refreshProducts();
         } catch (err) {
             setUploadError('Failed to upload image. Please try again.');
             console.error(err);
@@ -174,7 +176,7 @@ export default function ProductsPage() {
                 imageUrl = await uploadProductImage(imageFile);
             }
 
-            updateProduct(editingProduct.id, {
+            await updateProduct(editingProduct.id, {
                 name: formName,
                 price: parseFloat(formPrice) || 0,
                 category: formCategory,
@@ -184,7 +186,7 @@ export default function ProductsPage() {
             });
             resetForm();
             setEditingProduct(null);
-            refreshProducts();
+            await refreshProducts();
         } catch (err) {
             setUploadError('Failed to upload image. Please try again.');
             console.error(err);
@@ -193,16 +195,16 @@ export default function ProductsPage() {
         }
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-            deleteProduct(id);
-            refreshProducts();
+            await deleteProduct(id);
+            await refreshProducts();
         }
     };
 
-    const handleToggleAvailability = (product: Product) => {
-        updateProduct(product.id, { is_available: !product.is_available });
-        refreshProducts();
+    const handleToggleAvailability = async (product: Product) => {
+        await updateProduct(product.id, { is_available: !product.is_available });
+        await refreshProducts();
     };
 
     const openEdit = (product: Product) => {

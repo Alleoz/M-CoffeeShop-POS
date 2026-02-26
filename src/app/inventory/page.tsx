@@ -35,11 +35,13 @@ export default function InventoryPage() {
     const [formCost, setFormCost] = useState('');
     const [formCategory, setFormCategory] = useState('');
 
-    const refreshInventory = () => setInventory(getInventory());
+    const refreshInventory = async () => {
+        const data = await getInventory();
+        setInventory(data);
+    };
 
     useEffect(() => {
-        refreshInventory();
-        setMounted(true);
+        refreshInventory().then(() => setMounted(true));
     }, []);
 
     const filteredInventory = inventory.filter(i =>
@@ -51,9 +53,9 @@ export default function InventoryPage() {
         setFormName(''); setFormStock(''); setFormUnit(''); setFormMinStock(''); setFormCost(''); setFormCategory('');
     };
 
-    const handleAddItem = () => {
+    const handleAddItem = async () => {
         if (!formName || !formUnit) return;
-        addInventoryItem({
+        await addInventoryItem({
             name: formName,
             stock: parseFloat(formStock) || 0,
             unit: formUnit,
@@ -63,12 +65,12 @@ export default function InventoryPage() {
         });
         resetForm();
         setShowAdd(false);
-        refreshInventory();
+        await refreshInventory();
     };
 
-    const handleEditItem = () => {
+    const handleEditItem = async () => {
         if (!editItem) return;
-        updateInventoryItem(editItem.id, {
+        await updateInventoryItem(editItem.id, {
             name: formName,
             stock: parseFloat(formStock) || 0,
             unit: formUnit,
@@ -78,21 +80,21 @@ export default function InventoryPage() {
         });
         resetForm();
         setEditItem(null);
-        refreshInventory();
+        await refreshInventory();
     };
 
-    const handleRestock = () => {
+    const handleRestock = async () => {
         if (!restockItem || !restockAmount) return;
-        updateInventoryItem(restockItem.id, { stock: restockItem.stock + parseFloat(restockAmount) });
+        await updateInventoryItem(restockItem.id, { stock: restockItem.stock + parseFloat(restockAmount) });
         setRestockItem(null);
         setRestockAmount('');
-        refreshInventory();
+        await refreshInventory();
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm('Delete this inventory item?')) {
-            deleteInventoryItem(id);
-            refreshInventory();
+            await deleteInventoryItem(id);
+            await refreshInventory();
         }
     };
 

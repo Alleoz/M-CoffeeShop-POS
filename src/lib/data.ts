@@ -1,179 +1,359 @@
-import { Product, Order, InventoryItem, Expense } from '@/types/database';
-
-// Default products for initial seed
-const defaultProducts: Product[] = [
-    { id: '1', name: 'Caramel Latte', price: 180, category: 'Espresso', image: '☕', is_available: true, created_at: new Date().toISOString() },
-    { id: '2', name: 'Flat White', price: 160, category: 'Espresso', image: '☕', is_available: true, created_at: new Date().toISOString() },
-    { id: '3', name: 'Americano', price: 130, category: 'Espresso', image: '☕', is_available: true, created_at: new Date().toISOString() },
-    { id: '4', name: 'Cappuccino', price: 165, category: 'Espresso', image: '☕', is_available: true, created_at: new Date().toISOString() },
-    { id: '5', name: 'Espresso Shot', price: 100, category: 'Espresso', image: '☕', is_available: true, created_at: new Date().toISOString() },
-    { id: '6', name: 'Mocha', price: 185, category: 'Espresso', image: '☕', is_available: true, created_at: new Date().toISOString() },
-    { id: '7', name: 'Java Chip Frappe', price: 210, category: 'Frappe', image: '🥤', is_available: true, created_at: new Date().toISOString() },
-    { id: '8', name: 'Caramel Frappe', price: 200, category: 'Frappe', image: '🥤', is_available: true, created_at: new Date().toISOString() },
-    { id: '9', name: 'Matcha Frappe', price: 195, category: 'Frappe', image: '🍵', is_available: true, created_at: new Date().toISOString() },
-    { id: '10', name: 'Cookies & Cream Frappe', price: 210, category: 'Frappe', image: '🥤', is_available: true, created_at: new Date().toISOString() },
-    { id: '11', name: 'Blueberry Muffin', price: 95, category: 'Pastry', image: '🧁', is_available: true, created_at: new Date().toISOString() },
-    { id: '12', name: 'Croissant', price: 85, category: 'Pastry', image: '🥐', is_available: true, created_at: new Date().toISOString() },
-    { id: '13', name: 'Cinnamon Roll', price: 110, category: 'Pastry', image: '🍥', is_available: true, created_at: new Date().toISOString() },
-    { id: '14', name: 'Chocolate Cake Slice', price: 130, category: 'Pastry', image: '🍰', is_available: true, created_at: new Date().toISOString() },
-    { id: '15', name: 'Mango Smoothie', price: 160, category: 'Non-Coffee', image: '🥭', is_available: true, created_at: new Date().toISOString() },
-    { id: '16', name: 'Strawberry Shake', price: 170, category: 'Non-Coffee', image: '🍓', is_available: true, created_at: new Date().toISOString() },
-    { id: '17', name: 'Hot Chocolate', price: 145, category: 'Non-Coffee', image: '🍫', is_available: true, created_at: new Date().toISOString() },
-    { id: '18', name: 'Classic Milk Tea', price: 130, category: 'Tea', image: '🧋', is_available: true, created_at: new Date().toISOString() },
-    { id: '19', name: 'Earl Grey', price: 120, category: 'Tea', image: '🫖', is_available: true, created_at: new Date().toISOString() },
-    { id: '20', name: 'Jasmine Green Tea', price: 115, category: 'Tea', image: '🍵', is_available: true, created_at: new Date().toISOString() },
-];
-
-const defaultInventory: InventoryItem[] = [
-    { id: '1', name: 'Arabica Beans', stock: 12.5, unit: 'kg', min_stock: 5, cost_per_unit: 850, category: 'Coffee', updated_at: new Date().toISOString() },
-    { id: '2', name: 'Whole Milk', stock: 5.0, unit: 'L', min_stock: 8, cost_per_unit: 85, category: 'Dairy', updated_at: new Date().toISOString() },
-    { id: '3', name: 'Caramel Syrup', stock: 8.0, unit: 'Bottles', min_stock: 3, cost_per_unit: 320, category: 'Syrup', updated_at: new Date().toISOString() },
-    { id: '4', name: 'Paper Cups (12oz)', stock: 150, unit: 'pcs', min_stock: 50, cost_per_unit: 5, category: 'Packaging', updated_at: new Date().toISOString() },
-    { id: '5', name: 'Vanilla Syrup', stock: 6.0, unit: 'Bottles', min_stock: 3, cost_per_unit: 310, category: 'Syrup', updated_at: new Date().toISOString() },
-    { id: '6', name: 'Chocolate Powder', stock: 3.0, unit: 'kg', min_stock: 2, cost_per_unit: 420, category: 'Ingredients', updated_at: new Date().toISOString() },
-    { id: '7', name: 'Matcha Powder', stock: 1.5, unit: 'kg', min_stock: 1, cost_per_unit: 1200, category: 'Ingredients', updated_at: new Date().toISOString() },
-    { id: '8', name: 'Sugar', stock: 10, unit: 'kg', min_stock: 5, cost_per_unit: 60, category: 'Ingredients', updated_at: new Date().toISOString() },
-    { id: '9', name: 'Straws', stock: 200, unit: 'pcs', min_stock: 100, cost_per_unit: 2, category: 'Packaging', updated_at: new Date().toISOString() },
-    { id: '10', name: 'Napkins', stock: 300, unit: 'pcs', min_stock: 100, cost_per_unit: 1, category: 'Packaging', updated_at: new Date().toISOString() },
-];
-
-// ─────────── Helpers ───────────
-const STORAGE_KEYS = {
-    PRODUCTS: 'mcoffee_products',
-    ORDERS: 'mcoffee_orders',
-    INVENTORY: 'mcoffee_inventory',
-    EXPENSES: 'mcoffee_expenses',
-    ORDER_COUNTER: 'mcoffee_order_counter',
-};
-
-function getFromStorage<T>(key: string, fallback: T): T {
-    if (typeof window === 'undefined') return fallback;
-    try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
-    } catch {
-        return fallback;
-    }
-}
-
-function saveToStorage<T>(key: string, data: T): void {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(key, JSON.stringify(data));
-}
+import { supabase } from './supabase';
+import { Product, Order, InventoryItem, Expense, OrderItem } from '@/types/database';
 
 // ─────────── Products ───────────
-export function getProducts(): Product[] {
-    return getFromStorage<Product[]>(STORAGE_KEYS.PRODUCTS, defaultProducts);
+export async function getProducts(): Promise<Product[]> {
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching products:', error);
+        return [];
+    }
+
+    return (data || []).map(row => ({
+        ...row,
+        price: Number(row.price),
+    }));
 }
-export function saveProducts(products: Product[]): void {
-    saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+
+export async function saveProducts(products: Product[]): Promise<void> {
+    // Upsert all products
+    const { error } = await supabase
+        .from('products')
+        .upsert(products, { onConflict: 'id' });
+
+    if (error) console.error('Error saving products:', error);
 }
-export function addProduct(product: Omit<Product, 'id' | 'created_at'>): Product {
-    const products = getProducts();
-    const newProduct: Product = {
-        ...product,
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-    };
-    products.push(newProduct);
-    saveProducts(products);
-    return newProduct;
+
+export async function addProduct(product: Omit<Product, 'id' | 'created_at'>): Promise<Product | null> {
+    const { data, error } = await supabase
+        .from('products')
+        .insert({
+            name: product.name,
+            price: product.price,
+            category: product.category,
+            image: product.image,
+            description: product.description || null,
+            is_available: product.is_available,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error adding product:', error);
+        return null;
+    }
+
+    return { ...data, price: Number(data.price) };
 }
-export function updateProduct(id: string, updates: Partial<Product>): void {
-    const products = getProducts().map(p => p.id === id ? { ...p, ...updates } : p);
-    saveProducts(products);
+
+export async function updateProduct(id: string, updates: Partial<Product>): Promise<void> {
+    const { error } = await supabase
+        .from('products')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) console.error('Error updating product:', error);
 }
-export function deleteProduct(id: string): void {
-    saveProducts(getProducts().filter(p => p.id !== id));
+
+export async function deleteProduct(id: string): Promise<void> {
+    const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+
+    if (error) console.error('Error deleting product:', error);
 }
 
 // ─────────── Orders ───────────
-export function getOrders(): Order[] {
-    return getFromStorage<Order[]>(STORAGE_KEYS.ORDERS, []);
+export async function getOrders(): Promise<Order[]> {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching orders:', error);
+        return [];
+    }
+
+    return (data || []).map(row => ({
+        ...row,
+        subtotal: Number(row.subtotal),
+        tax: Number(row.tax),
+        total: Number(row.total),
+        amount_paid: Number(row.amount_paid),
+        change: Number(row.change),
+        items: (row.items as unknown as OrderItem[]) || [],
+    }));
 }
-export function saveOrders(orders: Order[]): void {
-    saveToStorage(STORAGE_KEYS.ORDERS, orders);
+
+export async function saveOrders(orders: Order[]): Promise<void> {
+    const { error } = await supabase
+        .from('orders')
+        .upsert(orders, { onConflict: 'id' });
+
+    if (error) console.error('Error saving orders:', error);
 }
-function getNextOrderNumber(): string {
-    const counter = getFromStorage<number>(STORAGE_KEYS.ORDER_COUNTER, 0) + 1;
-    saveToStorage(STORAGE_KEYS.ORDER_COUNTER, counter);
-    return String(counter).padStart(4, '0');
+
+async function getNextOrderNumber(): Promise<string> {
+    const { data, error } = await supabase
+        .rpc('nextval', { seq_name: 'order_number_seq' });
+
+    if (error) {
+        // Fallback: use timestamp-based number
+        console.error('Error getting order number:', error);
+        return String(Date.now()).slice(-6);
+    }
+
+    return String(data).padStart(4, '0');
 }
-export function createOrder(order: Omit<Order, 'id' | 'order_number' | 'created_at'>): Order {
-    const orders = getOrders();
-    const newOrder: Order = {
-        ...order,
-        id: crypto.randomUUID(),
-        order_number: getNextOrderNumber(),
-        created_at: new Date().toISOString(),
+
+export async function createOrder(order: Omit<Order, 'id' | 'order_number' | 'created_at'>): Promise<Order | null> {
+    const orderNumber = await getNextOrderNumber();
+
+    const { data, error } = await supabase
+        .from('orders')
+        .insert({
+            order_number: orderNumber,
+            customer_type: order.customer_type,
+            table_no: order.table_no,
+            items: order.items as unknown as Record<string, unknown>[],
+            subtotal: order.subtotal,
+            tax: order.tax,
+            total: order.total,
+            payment_method: order.payment_method,
+            amount_paid: order.amount_paid,
+            change: order.change,
+            status: order.status,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error creating order:', error);
+        return null;
+    }
+
+    return {
+        ...data,
+        subtotal: Number(data.subtotal),
+        tax: Number(data.tax),
+        total: Number(data.total),
+        amount_paid: Number(data.amount_paid),
+        change: Number(data.change),
+        items: (data.items as unknown as OrderItem[]) || [],
     };
-    orders.unshift(newOrder);
-    saveOrders(orders);
-    return newOrder;
 }
-export function updateOrder(id: string, updates: Partial<Order>): void {
-    const orders = getOrders().map(o => o.id === id ? { ...o, ...updates } : o);
-    saveOrders(orders);
+
+export async function updateOrder(id: string, updates: Partial<Order>): Promise<void> {
+    const { error } = await supabase
+        .from('orders')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) console.error('Error updating order:', error);
 }
 
 // ─────────── Inventory ───────────
-export function getInventory(): InventoryItem[] {
-    return getFromStorage<InventoryItem[]>(STORAGE_KEYS.INVENTORY, defaultInventory);
+export async function getInventory(): Promise<InventoryItem[]> {
+    const { data, error } = await supabase
+        .from('inventory')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching inventory:', error);
+        return [];
+    }
+
+    return (data || []).map(row => ({
+        ...row,
+        stock: Number(row.stock),
+        min_stock: Number(row.min_stock),
+        cost_per_unit: Number(row.cost_per_unit),
+    }));
 }
-export function saveInventory(items: InventoryItem[]): void {
-    saveToStorage(STORAGE_KEYS.INVENTORY, items);
+
+export async function saveInventory(items: InventoryItem[]): Promise<void> {
+    const { error } = await supabase
+        .from('inventory')
+        .upsert(items, { onConflict: 'id' });
+
+    if (error) console.error('Error saving inventory:', error);
 }
-export function addInventoryItem(item: Omit<InventoryItem, 'id' | 'updated_at'>): InventoryItem {
-    const items = getInventory();
-    const newItem: InventoryItem = { ...item, id: crypto.randomUUID(), updated_at: new Date().toISOString() };
-    items.push(newItem);
-    saveInventory(items);
-    return newItem;
+
+export async function addInventoryItem(item: Omit<InventoryItem, 'id' | 'updated_at'>): Promise<InventoryItem | null> {
+    const { data, error } = await supabase
+        .from('inventory')
+        .insert({
+            name: item.name,
+            stock: item.stock,
+            unit: item.unit,
+            min_stock: item.min_stock,
+            cost_per_unit: item.cost_per_unit,
+            category: item.category,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error adding inventory item:', error);
+        return null;
+    }
+
+    return {
+        ...data,
+        stock: Number(data.stock),
+        min_stock: Number(data.min_stock),
+        cost_per_unit: Number(data.cost_per_unit),
+    };
 }
-export function updateInventoryItem(id: string, updates: Partial<InventoryItem>): void {
-    const items = getInventory().map(i => i.id === id ? { ...i, ...updates, updated_at: new Date().toISOString() } : i);
-    saveInventory(items);
+
+export async function updateInventoryItem(id: string, updates: Partial<InventoryItem>): Promise<void> {
+    const { error } = await supabase
+        .from('inventory')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+    if (error) console.error('Error updating inventory item:', error);
 }
-export function deleteInventoryItem(id: string): void {
-    saveInventory(getInventory().filter(i => i.id !== id));
+
+export async function deleteInventoryItem(id: string): Promise<void> {
+    const { error } = await supabase
+        .from('inventory')
+        .delete()
+        .eq('id', id);
+
+    if (error) console.error('Error deleting inventory item:', error);
 }
 
 // ─────────── Expenses ───────────
-export function getExpenses(): Expense[] {
-    return getFromStorage<Expense[]>(STORAGE_KEYS.EXPENSES, []);
+export async function getExpenses(): Promise<Expense[]> {
+    const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching expenses:', error);
+        return [];
+    }
+
+    return (data || []).map(row => ({
+        ...row,
+        amount: Number(row.amount),
+    }));
 }
-export function saveExpenses(expenses: Expense[]): void {
-    saveToStorage(STORAGE_KEYS.EXPENSES, expenses);
+
+export async function saveExpenses(expenses: Expense[]): Promise<void> {
+    const { error } = await supabase
+        .from('expenses')
+        .upsert(expenses, { onConflict: 'id' });
+
+    if (error) console.error('Error saving expenses:', error);
 }
-export function addExpense(expense: Omit<Expense, 'id' | 'created_at'>): Expense {
-    const expenses = getExpenses();
-    const newExpense: Expense = { ...expense, id: crypto.randomUUID(), created_at: new Date().toISOString() };
-    expenses.unshift(newExpense);
-    saveExpenses(expenses);
-    return newExpense;
+
+export async function addExpense(expense: Omit<Expense, 'id' | 'created_at'>): Promise<Expense | null> {
+    const { data, error } = await supabase
+        .from('expenses')
+        .insert({
+            date: expense.date,
+            category: expense.category,
+            amount: expense.amount,
+            description: expense.description,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error adding expense:', error);
+        return null;
+    }
+
+    return { ...data, amount: Number(data.amount) };
 }
-export function deleteExpense(id: string): void {
-    saveExpenses(getExpenses().filter(e => e.id !== id));
+
+export async function deleteExpense(id: string): Promise<void> {
+    const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('id', id);
+
+    if (error) console.error('Error deleting expense:', error);
 }
 
 // ─────────── Dashboard Stats ───────────
-export function getTodayStats() {
+export async function getTodayStats() {
     const today = new Date().toISOString().slice(0, 10);
-    const orders = getOrders().filter(o => o.created_at.slice(0, 10) === today && o.status !== 'Cancelled');
-    const expenses = getExpenses().filter(e => e.date === today);
 
-    const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+    const [ordersResult, expensesResult] = await Promise.all([
+        supabase
+            .from('orders')
+            .select('total')
+            .gte('created_at', `${today}T00:00:00`)
+            .lte('created_at', `${today}T23:59:59`)
+            .neq('status', 'Cancelled'),
+        supabase
+            .from('expenses')
+            .select('amount')
+            .eq('date', today),
+    ]);
+
+    const orders = ordersResult.data || [];
+    const expenses = expensesResult.data || [];
+
+    const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total), 0);
     const totalOrders = orders.length;
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
     return { totalRevenue, totalOrders, totalExpenses, averageOrderValue };
 }
 
-export function getRecentOrders(limit = 10): Order[] {
-    return getOrders().slice(0, limit);
+export async function getRecentOrders(limit = 10): Promise<Order[]> {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+    if (error) {
+        console.error('Error fetching recent orders:', error);
+        return [];
+    }
+
+    return (data || []).map(row => ({
+        ...row,
+        subtotal: Number(row.subtotal),
+        tax: Number(row.tax),
+        total: Number(row.total),
+        amount_paid: Number(row.amount_paid),
+        change: Number(row.change),
+        items: (row.items as unknown as OrderItem[]) || [],
+    }));
 }
 
-export function getLowStockItems(): InventoryItem[] {
-    return getInventory().filter(i => i.stock <= i.min_stock);
+export async function getLowStockItems(): Promise<InventoryItem[]> {
+    const { data, error } = await supabase
+        .from('inventory')
+        .select('*');
+
+    if (error) {
+        console.error('Error fetching low stock items:', error);
+        return [];
+    }
+
+    // Filter client-side since Supabase can't compare two columns directly in a simple query
+    return (data || [])
+        .map(row => ({
+            ...row,
+            stock: Number(row.stock),
+            min_stock: Number(row.min_stock),
+            cost_per_unit: Number(row.cost_per_unit),
+        }))
+        .filter(i => i.stock <= i.min_stock);
 }

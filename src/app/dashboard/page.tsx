@@ -28,10 +28,18 @@ export default function Dashboard() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setStats(getTodayStats());
-        setRecentOrders(getRecentOrders(8));
-        setLowStock(getLowStockItems());
-        setMounted(true);
+        const loadData = async () => {
+            const [statsData, ordersData, lowStockData] = await Promise.all([
+                getTodayStats(),
+                getRecentOrders(8),
+                getLowStockItems(),
+            ]);
+            setStats(statsData);
+            setRecentOrders(ordersData);
+            setLowStock(lowStockData);
+            setMounted(true);
+        };
+        loadData();
     }, []);
 
     const statCards = [

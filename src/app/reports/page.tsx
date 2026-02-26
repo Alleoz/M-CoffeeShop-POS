@@ -47,16 +47,23 @@ export default function ReportsPage() {
     const [exportSuccess, setExportSuccess] = useState('');
 
     useEffect(() => {
-        setOrders(getOrders());
-        setExpenses(getExpenses());
-        setMounted(true);
+        const loadData = async () => {
+            const [ordersData, expensesData] = await Promise.all([
+                getOrders(),
+                getExpenses(),
+            ]);
+            setOrders(ordersData);
+            setExpenses(expensesData);
+            setMounted(true);
 
-        // Set default export date range to this month
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
-        const today = now.toISOString().slice(0, 10);
-        setExportDateFrom(firstDay);
-        setExportDateTo(today);
+            // Set default export date range to this month
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+            const today = now.toISOString().slice(0, 10);
+            setExportDateFrom(firstDay);
+            setExportDateTo(today);
+        };
+        loadData();
     }, []);
 
     const filteredOrders = useMemo(() => {
@@ -123,7 +130,7 @@ export default function ReportsPage() {
         }
     };
 
-    const handleExport = () => {
+    const handleExport = async () => {
         const dateRangeParam = (exportDateFrom && exportDateTo)
             ? { from: exportDateFrom, to: exportDateTo }
             : undefined;
@@ -131,19 +138,19 @@ export default function ReportsPage() {
         let count = 0;
         switch (selectedExport) {
             case 'orders':
-                count = exportOrders(dateRangeParam);
+                count = await exportOrders(dateRangeParam);
                 break;
             case 'inventory':
-                count = exportInventory();
+                count = await exportInventory();
                 break;
             case 'expenses':
-                count = exportExpenses(dateRangeParam);
+                count = await exportExpenses(dateRangeParam);
                 break;
             case 'products':
-                count = exportProducts();
+                count = await exportProducts();
                 break;
             case 'sales_summary':
-                count = exportSalesSummary(dateRangeParam);
+                count = await exportSalesSummary(dateRangeParam);
                 break;
         }
 

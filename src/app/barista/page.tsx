@@ -19,24 +19,23 @@ export default function BaristaScreen() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [mounted, setMounted] = useState(false);
 
-    const refreshOrders = () => {
-        const allOrders = getOrders().filter(o => o.status !== 'Completed' && o.status !== 'Cancelled');
-        setOrders(allOrders);
+    const refreshOrders = async () => {
+        const allOrders = await getOrders();
+        setOrders(allOrders.filter(o => o.status !== 'Completed' && o.status !== 'Cancelled'));
     };
 
     useEffect(() => {
-        refreshOrders();
-        setMounted(true);
+        refreshOrders().then(() => setMounted(true));
         const interval = setInterval(refreshOrders, 5000);
         return () => clearInterval(interval);
     }, []);
 
-    const moveStatus = (id: string, nextStatus: Order['status']) => {
-        updateOrder(id, {
+    const moveStatus = async (id: string, nextStatus: Order['status']) => {
+        await updateOrder(id, {
             status: nextStatus,
             ...(nextStatus === 'Completed' ? { completed_at: new Date().toISOString() } : {}),
         });
-        refreshOrders();
+        await refreshOrders();
     };
 
     const getTimeSince = (dateStr: string) => {

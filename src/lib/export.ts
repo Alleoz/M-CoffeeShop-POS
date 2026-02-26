@@ -30,8 +30,8 @@ function downloadCsv(filename: string, csvContent: string) {
 
 // ─────────── Export Functions ───────────
 
-export function exportOrders(dateRange?: { from: string; to: string }) {
-    let orders = getOrders();
+export async function exportOrders(dateRange?: { from: string; to: string }) {
+    let orders = await getOrders();
 
     if (dateRange) {
         orders = orders.filter(o => {
@@ -71,8 +71,8 @@ export function exportOrders(dateRange?: { from: string; to: string }) {
     return orders.length;
 }
 
-export function exportInventory() {
-    const inventory = getInventory();
+export async function exportInventory() {
+    const inventory = await getInventory();
 
     const headers = [
         'Item Name', 'Category', 'Current Stock', 'Unit',
@@ -103,8 +103,8 @@ export function exportInventory() {
     return inventory.length;
 }
 
-export function exportExpenses(dateRange?: { from: string; to: string }) {
-    let expenses = getExpenses();
+export async function exportExpenses(dateRange?: { from: string; to: string }) {
+    let expenses = await getExpenses();
 
     if (dateRange) {
         expenses = expenses.filter(e => {
@@ -133,8 +133,8 @@ export function exportExpenses(dateRange?: { from: string; to: string }) {
     return expenses.length;
 }
 
-export function exportProducts() {
-    const products = getProducts();
+export async function exportProducts() {
+    const products = await getProducts();
 
     const headers = [
         'ID', 'Name', 'Category', 'Price (₱)', 'Available', 'Created',
@@ -154,9 +154,9 @@ export function exportProducts() {
     return products.length;
 }
 
-export function exportSalesSummary(dateRange?: { from: string; to: string }) {
-    let orders = getOrders().filter(o => o.status !== 'Cancelled');
-    let expenses = getExpenses();
+export async function exportSalesSummary(dateRange?: { from: string; to: string }) {
+    let orders = (await getOrders()).filter(o => o.status !== 'Cancelled');
+    let expenses = await getExpenses();
 
     if (dateRange) {
         orders = orders.filter(o => {
