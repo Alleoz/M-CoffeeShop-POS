@@ -4,7 +4,7 @@ import { Bell, Search, Clock, Menu } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/store/useSidebarStore';
 
-export default function Header() {
+export default function Header({ title }: { title?: string }) {
     const [currentTime, setCurrentTime] = useState('');
     const [currentDate, setCurrentDate] = useState('');
     const { toggle } = useSidebarStore();
@@ -30,6 +30,11 @@ export default function Header() {
                 >
                     <Menu size={20} />
                 </button>
+
+                {/* Page title - mobile/tablet only */}
+                {title && (
+                    <h1 className="text-sm font-extrabold text-text-primary lg:hidden truncate">{title}</h1>
+                )}
 
                 <div className="relative max-w-md w-full hidden md:block">
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-text-tertiary" />

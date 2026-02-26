@@ -7,29 +7,73 @@ import { Coffee } from 'lucide-react';
 
 const PUBLIC_ROUTES = ['/login'];
 
+// Role-based route access
+type Role = 'admin' | 'manager' | 'cashier' | 'barista';
+
+const ROUTE_PERMISSIONS: Record<string, Role[]> = {
+    '/dashboard': ['admin', 'manager'],
+    '/pos': ['admin', 'manager', 'cashier'],
+    '/products': ['admin', 'manager'],
+    '/barista': ['admin', 'manager', 'barista'],
+    '/inventory': ['admin', 'manager'],
+    '/reports': ['admin', 'manager'],
+    '/expenses': ['admin', 'manager'],
+    '/staff': ['admin'],
+};
+
+function getDefaultRoute(role: Role): string {
+    switch (role) {
+        case 'admin':
+        case 'manager':
+            return '/dashboard';
+        case 'cashier':
+            return '/pos';
+        case 'barista':
+            return '/barista';
+        default:
+            return '/dashboard';
+    }
+}
+
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
-    const { isAuthenticated, checkAuth } = useAuthStore();
+    const { isAuthenticated, staff, checkAuth } = useAuthStore();
     const [checking, setChecking] = useState(true);
 
     useEffect(() => {
-        const isAuth = checkAuth();
-        const isPublic = PUBLIC_ROUTES.includes(pathname);
+        const verify = async () => {
+            const isAuth = await checkAuth();
+            const isPublic = PUBLIC_ROUTES.includes(pathname);
 
-        if (!isAuth && !isPublic) {
-            router.replace('/login');
-        } else if (isAuth && isPublic) {
-            router.replace('/dashboard');
-        }
+            if (!isAuth && !isPublic) {
+                router.replace('/login');
+            } else if (isAuth && isPublic) {
+                // Redirect to the appropriate default page based on role
+                const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
+                router.replace(getDefaultRoute(role));
+            } else if (isAuth && !isPublic) {
+                // Check role-based access
+                const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
+                const basePath = '/' + pathname.split('/').filter(Boolean)[0];
+                const allowedRoles = ROUTE_PERMISSIONS[basePath];
 
-        setChecking(false);
+                if (allowedRoles && !allowedRoles.includes(role)) {
+                    // Redirect to their default route if unauthorized
+                    router.replace(getDefaultRoute(role));
+                }
+            }
+
+            setChecking(false);
+        };
+
+        verify();
     }, [pathname, checkAuth, router]);
 
     // Show loading screen while checking auth
     if (checking) {
         return (
-            <div className="min-h-screen bg-background-dark flex items-center justify-center">
+            <div className="min-h-screen bg-bg-app flex items-center justify-center">
                 <div className="text-center animate-fade-in">
                     <div className="inline-flex items-center justify-center size-16 bg-primary rounded-2xl shadow-2xl shadow-primary/30 mb-4">
                         <Coffee size={28} className="text-white" />

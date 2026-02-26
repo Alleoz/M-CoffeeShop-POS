@@ -1,58 +1,152 @@
 import { create } from 'zustand';
+import { supabase } from '@/lib/supabase';
+
+interface StaffInfo {
+    id: string;
+    name: string;
+    role: 'admin' | 'manager' | 'cashier' | 'barista';
+}
 
 interface AuthStore {
     isAuthenticated: boolean;
-    user: { name: string; role: string } | null;
-    login: (pin: string) => boolean;
-    logout: () => void;
-    checkAuth: () => boolean;
+    staff: StaffInfo | null;
+    isLoading: boolean;
+    error: string | null;
+    locked: boolean;
+    lockRemainingSeconds: number;
+    attemptsRemaining: number | null;
+    login: (pin: string) => Promise<boolean>;
+    logout: () => Promise<void>;
+    checkAuth: () => Promise<boolean>;
+    clearError: () => void;
 }
 
-// Admin credentials - in production, use a secure backend
-const ADMIN_PIN = '1234';
-const ADMIN_USER = { name: 'M Coffee Admin', role: 'Administrator' };
-
-const AUTH_KEY = 'mcoffee_auth';
+const STAFF_KEY = 'mcoffee_staff';
+const SESSION_TS_KEY = 'mcoffee_session_ts';
+const SESSION_DURATION = 12 * 60 * 60 * 1000; // 12 hours
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
     isAuthenticated: false,
-    user: null,
+    staff: null,
+    isLoading: false,
+    error: null,
+    locked: false,
+    lockRemainingSeconds: 0,
+    attemptsRemaining: null,
 
-    login: (pin: string) => {
-        if (pin === ADMIN_PIN) {
-            const session = { isAuthenticated: true, user: ADMIN_USER, timestamp: Date.now() };
-            if (typeof window !== 'undefined') {
-                localStorage.setItem(AUTH_KEY, JSON.stringify(session));
-            }
-            set({ isAuthenticated: true, user: ADMIN_USER });
-            return true;
-        }
-        return false;
-    },
+    login: async (pin: string) => {
+        set({ isLoading: true, error: null, locked: false });
 
-    logout: () => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem(AUTH_KEY);
-        }
-        set({ isAuthenticated: false, user: null });
-    },
-
-    checkAuth: () => {
-        if (typeof window === 'undefined') return false;
         try {
-            const raw = localStorage.getItem(AUTH_KEY);
-            if (!raw) return false;
-            const session = JSON.parse(raw);
-            // Session expires after 12 hours
-            if (Date.now() - session.timestamp > 12 * 60 * 60 * 1000) {
-                localStorage.removeItem(AUTH_KEY);
-                set({ isAuthenticated: false, user: null });
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pin }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                set({
+                    isLoading: false,
+                    error: data.error || 'Login failed.',
+                    locked: data.locked || false,
+                    lockRemainingSeconds: data.remainingSeconds || 0,
+                    attemptsRemaining: data.attemptsRemaining ?? null,
+                });
                 return false;
             }
-            set({ isAuthenticated: true, user: session.user });
+
+            // Establish Supabase Auth session on the client
+            const { error: sessionError } = await supabase.auth.setSession({
+                access_token: data.session.access_token,
+                refresh_token: data.session.refresh_token,
+            });
+
+            if (sessionError) {
+                console.error('setSession error:', sessionError);
+                set({ isLoading: false, error: 'Failed to establish session.' });
+                return false;
+            }
+
+            // Persist staff identity
+            const staffInfo: StaffInfo = data.staff;
+            if (typeof window !== 'undefined') {
+                localStorage.setItem(STAFF_KEY, JSON.stringify(staffInfo));
+                localStorage.setItem(SESSION_TS_KEY, String(Date.now()));
+            }
+
+            set({
+                isAuthenticated: true,
+                staff: staffInfo,
+                isLoading: false,
+                error: null,
+                locked: false,
+                attemptsRemaining: null,
+            });
+
             return true;
-        } catch {
+        } catch (err) {
+            console.error('Login error:', err);
+            set({ isLoading: false, error: 'Network error. Please try again.' });
             return false;
         }
     },
+
+    logout: async () => {
+        try {
+            await supabase.auth.signOut();
+        } catch (e) {
+            console.error('Sign out error:', e);
+        }
+
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(STAFF_KEY);
+            localStorage.removeItem(SESSION_TS_KEY);
+        }
+
+        set({
+            isAuthenticated: false,
+            staff: null,
+            error: null,
+            locked: false,
+            attemptsRemaining: null,
+        });
+    },
+
+    checkAuth: async () => {
+        if (typeof window === 'undefined') return false;
+
+        try {
+            // Check 12-hour session expiry
+            const ts = localStorage.getItem(SESSION_TS_KEY);
+            if (!ts || Date.now() - Number(ts) > SESSION_DURATION) {
+                await get().logout();
+                return false;
+            }
+
+            // Verify Supabase Auth session is still valid
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                await get().logout();
+                return false;
+            }
+
+            // Restore staff info
+            const raw = localStorage.getItem(STAFF_KEY);
+            if (!raw) {
+                await get().logout();
+                return false;
+            }
+
+            const staffInfo = JSON.parse(raw) as StaffInfo;
+            set({ isAuthenticated: true, staff: staffInfo });
+            return true;
+        } catch {
+            await get().logout();
+            return false;
+        }
+    },
+
+    clearError: () => set({ error: null }),
 }));

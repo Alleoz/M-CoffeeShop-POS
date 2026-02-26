@@ -46,7 +46,7 @@ export default function RootLayout({
                 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
                 <link rel="apple-touch-icon" href="/icons/icon.svg" />
             </head>
-            <body className="antialiased bg-bg-app text-text-primary">
+            <body className="antialiased bg-bg-app text-text-primary" suppressHydrationWarning>
                 <AuthGuard>
                     {children}
                 </AuthGuard>

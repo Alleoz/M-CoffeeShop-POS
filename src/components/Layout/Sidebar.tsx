@@ -13,25 +13,32 @@ import {
     Boxes,
     FileBarChart,
     Receipt,
+    Users,
     LogOut,
     X,
 } from 'lucide-react';
 
+type Role = 'admin' | 'manager' | 'cashier' | 'barista';
+
 const navItems = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'New Order', href: '/pos', icon: ShoppingCart },
-    { name: 'Products', href: '/products', icon: Coffee },
-    { name: 'Barista KDS', href: '/barista', icon: ChefHat },
-    { name: 'Inventory', href: '/inventory', icon: Boxes },
-    { name: 'Reports', href: '/reports', icon: FileBarChart },
-    { name: 'Expenses', href: '/expenses', icon: Receipt },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'manager'] as Role[] },
+    { name: 'New Order', href: '/pos', icon: ShoppingCart, roles: ['admin', 'manager', 'cashier'] as Role[] },
+    { name: 'Products', href: '/products', icon: Coffee, roles: ['admin', 'manager'] as Role[] },
+    { name: 'Barista KDS', href: '/barista', icon: ChefHat, roles: ['admin', 'manager', 'barista'] as Role[] },
+    { name: 'Inventory', href: '/inventory', icon: Boxes, roles: ['admin', 'manager'] as Role[] },
+    { name: 'Reports', href: '/reports', icon: FileBarChart, roles: ['admin', 'manager'] as Role[] },
+    { name: 'Expenses', href: '/expenses', icon: Receipt, roles: ['admin', 'manager'] as Role[] },
+    { name: 'Staff', href: '/staff', icon: Users, roles: ['admin'] as Role[] },
 ];
 
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
-    const { user, logout } = useAuthStore();
+    const { staff, logout } = useAuthStore();
     const { isOpen, close } = useSidebarStore();
+
+    const userRole = (staff?.role || 'cashier') as Role;
+    const filteredNavItems = navItems.filter((item) => item.roles.includes(userRole));
 
     const handleLogout = () => {
         logout();
@@ -41,6 +48,11 @@ export default function Sidebar() {
     const handleNavClick = () => {
         close();
     };
+
+    // Get staff initials for avatar
+    const initials = staff?.name
+        ? staff.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+        : 'MC';
 
     return (
         <>
@@ -83,7 +95,7 @@ export default function Sidebar() {
                 {/* Navigation */}
                 <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
                     <p className="px-3 py-2.5 text-[10px] font-extrabold text-text-tertiary uppercase tracking-[0.15em]">Menu</p>
-                    {navItems.map((item) => {
+                    {filteredNavItems.map((item) => {
                         const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
                         return (
                             <Link
@@ -108,11 +120,11 @@ export default function Sidebar() {
                 <div className="p-4 border-t border-border-light">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-bg-muted">
                         <div className="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
-                            JD
+                            {initials}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="text-xs font-bold truncate text-text-primary">{user?.name || 'M Coffee Admin'}</p>
-                            <p className="text-[10px] text-text-tertiary truncate">{user?.role || 'Staff'}</p>
+                            <p className="text-xs font-bold truncate text-text-primary">{staff?.name || 'Staff'}</p>
+                            <p className="text-[10px] text-text-tertiary truncate capitalize">{staff?.role || 'Staff'}</p>
                         </div>
                         <button onClick={handleLogout} title="Log out" className="text-text-tertiary hover:text-error transition-colors">
                             <LogOut size={16} />
