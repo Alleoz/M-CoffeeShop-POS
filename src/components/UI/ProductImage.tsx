@@ -52,7 +52,7 @@ export default function ProductImage({ image, name, size = 'md', className = '' 
     // Default placeholder when no image
     return (
         <div className={`${className} flex items-center justify-center`}>
-            <Coffee size={size === 'sm' ? 16 : size === 'md' ? 24 : 32} className="text-slate-300 dark:text-slate-600" />
+            <Coffee size={size === 'sm' ? 16 : size === 'md' ? 24 : 32} className="text-slate-300" />
         </div>
     );
 }

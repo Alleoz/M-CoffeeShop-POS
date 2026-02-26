@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════
+   M COFFEE — BRIGHT MODERN POS  ·  Design Token v1
+   ═══════════════════════════════════════════════════ */
+
 /* ─────────── Theme Configuration (TW v4) ─────────── */
 @theme {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Inter', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
   --font-icons: 'Material Symbols Outlined';
 
-  --color-primary: #4276fa;
-  --color-primary-glow: rgba(66, 118, 250, 0.15);
+  /* ── Brand ── */
+  --color-primary: #BAFA42;
+  --color-primary-hover: #A9E830;
+  --color-primary-active: #96D320;
+  --color-primary-glow: rgba(186, 250, 66, 0.2);
 
-  --color-background-light: #f5f6f8;
+  /* ── Background ── */
+  --color-bg-app: #F8F9FA;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-muted: #F3F4F6;
+  --color-bg-highlight: #FAFAFA;
+
+  /* ── Text ── */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-on-primary: #111827;
+
+  /* ── Border ── */
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-border-focus: #BAFA42;
+
+  /* ── Status ── */
+  --color-success: #22C55E;
+  --color-success-bg: #DCFCE7;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FEF3C7;
+  --color-error: #EF4444;
+  --color-error-bg: #FEE2E2;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  --shadow-panel: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+  --shadow-button: 0 4px 6px -1px rgba(186, 250, 66, 0.2);
+
+  /* ── Radius ── */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-pill: 9999px;
+
+  /* ── Old slate aliases (TW compat) ── */
+  --color-slate-50: #F8F9FA;
+  --color-slate-100: #F3F4F6;
+  --color-slate-200: #E5E7EB;
+  --color-slate-400: #9CA3AF;
+  --color-slate-500: #6B7280;
+  --color-slate-600: #4B5563;
+  --color-slate-700: #374151;
+  --color-slate-800: #1F2937;
+  --color-slate-900: #111827;
+
+  --color-background-light: #F8F9FA;
   --color-background-dark: #0f1523;
-
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1e293b;
-  --color-slate-900: #0f172a;
 
   --animate-fade-in: fadeIn 0.4s ease-out both;
   --animate-slide-up: slideInUp 0.4s ease-out both;
@@ -29,20 +76,16 @@
 
 /* ─────────── CSS Variables ─────────── */
 :root {
-  --background: #f5f6f8;
-  --foreground: #0f172a;
-  --primary: #4276fa;
-  --primary-glow: rgba(66, 118, 250, 0.15);
-  --card-bg: #ffffff;
-  --card-border: #e2e8f0;
+  --background: #F8F9FA;
+  --foreground: #111827;
+  --primary: #BAFA42;
+  --primary-hover: #A9E830;
+  --primary-glow: rgba(186, 250, 66, 0.2);
+  --card-bg: #FFFFFF;
+  --card-border: #E5E7EB;
 }
 
-.dark {
-  --background: #0f1523;
-  --foreground: #f1f5f9;
-  --card-bg: #0f172a;
-  --card-border: #1e293b;
-}
+
 
 /* ─────────── Base Styles ─────────── */
 * {
@@ -51,8 +94,8 @@
 }
 
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 *::-webkit-scrollbar-track {
@@ -67,9 +110,10 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
 /* ─────────── Material Symbols ─────────── */
@@ -146,11 +190,11 @@ body {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(66, 118, 250, 0.4);
+    box-shadow: 0 0 0 0 rgba(186, 250, 66, 0.35);
   }
 
   50% {
-    box-shadow: 0 0 0 12px rgba(66, 118, 250, 0);
+    box-shadow: 0 0 0 10px rgba(186, 250, 66, 0);
   }
 }
 
@@ -304,15 +348,34 @@ body {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+/* ─────────── Primary Button Glow ─────────── */
+.btn-primary {
+  background: var(--primary);
+  color: var(--foreground);
+  font-weight: 700;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-button);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 6px 16px -2px rgba(186, 250, 66, 0.35);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
   z-index: 50;
   animation: overlayShow 0.2s ease-out;
 }

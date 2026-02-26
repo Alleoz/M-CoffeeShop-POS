@@ -75,18 +75,18 @@ export default function ExpensesPage() {
 
     const getCategoryColor = (cat: string) => {
         switch (cat) {
-            case 'Supplies': return 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400';
-            case 'Utilities': return 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400';
-            case 'Marketing': return 'bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400';
-            case 'Maintenance': return 'bg-teal-50 text-teal-600 dark:bg-teal-900/20 dark:text-teal-400';
-            case 'Salaries': return 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400';
-            case 'Rent': return 'bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400';
-            default: return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+            case 'Supplies': return 'bg-blue-50 text-blue-600';
+            case 'Utilities': return 'bg-amber-50 text-amber-600';
+            case 'Marketing': return 'bg-violet-50 text-violet-600';
+            case 'Maintenance': return 'bg-teal-50 text-teal-600';
+            case 'Salaries': return 'bg-emerald-50 text-emerald-600';
+            case 'Rent': return 'bg-rose-50 text-rose-600';
+            default: return 'bg-slate-100 text-slate-600';
         }
     };
 
     return (
-        <div className="flex bg-slate-50 dark:bg-background-dark min-h-screen">
+        <div className="flex bg-bg-app min-h-screen">
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header />
@@ -108,16 +108,16 @@ export default function ExpensesPage() {
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 stagger-children">
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm card-hover animate-fade-in">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm card-hover animate-fade-in">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="size-11 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-500">
+                                <div className="size-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
                                     <DollarSign size={20} />
                                 </div>
                                 <span className="font-bold text-slate-400 text-sm">Month-to-Date</span>
                             </div>
                             <p className="text-3xl font-black tracking-tight">₱{mounted ? totalMonthExpenses.toLocaleString('en', { minimumFractionDigits: 2 }) : '—'}</p>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '80ms' }}>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '80ms' }}>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="size-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                     <TrendingDown size={20} />
@@ -129,10 +129,10 @@ export default function ExpensesPage() {
                     </div>
 
                     {/* Expenses Table */}
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm animate-slide-up">
+                    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm animate-slide-up">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm min-w-[500px]">
-                                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <thead className="bg-slate-50 border-b border-slate-200">
                                     <tr>
                                         <th className="px-4 md:px-6 py-4 font-bold text-slate-400 uppercase text-[10px] tracking-wider">Date</th>
                                         <th className="px-4 md:px-6 py-4 font-bold text-slate-400 uppercase text-[10px] tracking-wider">Category</th>
@@ -141,10 +141,10 @@ export default function ExpensesPage() {
                                         <th className="px-4 md:px-6 py-4 font-bold text-slate-400 uppercase text-[10px] tracking-wider text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                                <tbody className="divide-y divide-slate-50">
                                     {mounted && expenses.map((expense) => (
-                                        <tr key={expense.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
-                                            <td className="px-4 md:px-6 py-4 text-slate-600 dark:text-slate-400 font-medium">
+                                        <tr key={expense.id} className="hover:bg-slate-50/50 transition-colors group">
+                                            <td className="px-4 md:px-6 py-4 text-slate-600 font-medium">
                                                 <div className="flex items-center gap-2">
                                                     <Calendar size={14} className="text-slate-400 hidden sm:block" />
                                                     {expense.date}
@@ -158,11 +158,11 @@ export default function ExpensesPage() {
                                             <td className="px-4 md:px-6 py-4 font-black text-rose-500">
                                                 -₱{expense.amount.toFixed(2)}
                                             </td>
-                                            <td className="px-4 md:px-6 py-4 text-slate-500 dark:text-slate-400 max-w-xs truncate hidden md:table-cell">
+                                            <td className="px-4 md:px-6 py-4 text-slate-500 max-w-xs truncate hidden md:table-cell">
                                                 {expense.description || '—'}
                                             </td>
                                             <td className="px-4 md:px-6 py-4 text-right">
-                                                <button onClick={() => handleDelete(expense.id)} className="size-8 flex items-center justify-center rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-400 hover:text-rose-600 transition-colors opacity-100 lg:opacity-0 lg:group-hover:opacity-100 ml-auto">
+                                                <button onClick={() => handleDelete(expense.id)} className="size-8 flex items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors opacity-100 lg:opacity-0 lg:group-hover:opacity-100 ml-auto">
                                                     <Trash2 size={15} />
                                                 </button>
                                             </td>
@@ -191,7 +191,7 @@ export default function ExpensesPage() {
                             type="date"
                             value={formDate}
                             onChange={(e) => setFormDate(e.target.value)}
-                            className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all font-display"
+                            className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all font-display"
                         />
                     </div>
                     <div>
@@ -205,8 +205,8 @@ export default function ExpensesPage() {
                                     className={clsx(
                                         "px-4 py-2 rounded-xl text-xs font-bold border transition-all",
                                         formCategory === cat
-                                            ? "border-primary bg-primary/5 text-primary dark:bg-primary/10 dark:border-primary dark:text-primary"
-                                            : "border-slate-200 dark:border-slate-700 text-slate-500 hover:border-slate-300"
+                                            ? "border-primary bg-primary/5 text-primary"
+                                            : "border-slate-200 text-slate-500 hover:border-slate-300"
                                     )}
                                 >
                                     {cat}
@@ -221,7 +221,7 @@ export default function ExpensesPage() {
                             value={formAmount}
                             onChange={(e) => setFormAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-lg font-bold outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all font-display"
+                            className="w-full border border-slate-200 rounded-xl py-3 px-4 text-lg font-bold outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all font-display"
                         />
                     </div>
                     <div>
@@ -231,7 +231,7 @@ export default function ExpensesPage() {
                             onChange={(e) => setFormDescription(e.target.value)}
                             placeholder="What was this expense for?"
                             rows={3}
-                            className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all resize-none"
+                            className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all resize-none"
                         />
                     </div>
                     <button

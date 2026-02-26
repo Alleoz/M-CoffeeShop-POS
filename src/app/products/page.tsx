@@ -237,8 +237,8 @@ export default function ProductsPage() {
                         className={clsx(
                             "relative size-28 rounded-2xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all overflow-hidden group shrink-0",
                             imagePreview
-                                ? "border-primary/40 dark:border-primary/60"
-                                : "border-slate-300 dark:border-slate-600 hover:border-primary/40 dark:hover:border-primary/40 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                ? "border-primary/40"
+                                : "border-slate-300 hover:border-primary/40 hover:bg-slate-50"
                         )}
                     >
                         {imagePreview ? (
@@ -278,7 +278,7 @@ export default function ProductsPage() {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors"
                             >
                                 <Upload size={12} />
                                 {imagePreview ? 'Change' : 'Browse'}
@@ -287,7 +287,7 @@ export default function ProductsPage() {
                                 <button
                                     type="button"
                                     onClick={removeImage}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-900/40 text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-200 text-xs font-bold text-rose-500 hover:bg-rose-50 transition-colors"
                                 >
                                     <X size={12} />
                                     Remove
@@ -308,7 +308,7 @@ export default function ProductsPage() {
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="e.g. Caramel Latte"
-                    className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all"
+                    className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
                 />
             </div>
 
@@ -321,7 +321,7 @@ export default function ProductsPage() {
                         value={formPrice}
                         onChange={(e) => setFormPrice(e.target.value)}
                         placeholder="0"
-                        className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all"
+                        className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
                     />
                 </div>
                 <div>
@@ -330,7 +330,7 @@ export default function ProductsPage() {
                         value={formCategory}
                         onChange={(e) => setFormCategory(e.target.value)}
                         placeholder="e.g. Espresso, Frappe"
-                        className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all"
+                        className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
                     />
                 </div>
             </div>
@@ -343,12 +343,12 @@ export default function ProductsPage() {
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Short description of the product..."
                     rows={2}
-                    className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white dark:bg-slate-900 transition-all resize-none"
+                    className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all resize-none"
                 />
             </div>
 
             {/* Availability Toggle */}
-            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50">
                 <div>
                     <p className="text-sm font-bold">Available on Menu</p>
                     <p className="text-[10px] text-slate-400 mt-0.5">Product will be visible in the POS menu when enabled</p>
@@ -358,7 +358,7 @@ export default function ProductsPage() {
                     onClick={() => setFormAvailable(!formAvailable)}
                     className={clsx(
                         "transition-colors",
-                        formAvailable ? "text-emerald-500" : "text-slate-300 dark:text-slate-600"
+                        formAvailable ? "text-emerald-500" : "text-slate-300"
                     )}
                 >
                     {formAvailable ? <ToggleRight size={36} /> : <ToggleLeft size={36} />}
@@ -384,7 +384,7 @@ export default function ProductsPage() {
     );
 
     return (
-        <div className="flex bg-slate-50 dark:bg-background-dark min-h-screen">
+        <div className="flex bg-bg-app min-h-screen">
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header />
@@ -410,7 +410,7 @@ export default function ProductsPage() {
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6 animate-fade-in" style={{ animationDelay: '50ms' }}>
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-sm">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
                             <div className="flex items-center gap-3">
                                 <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
                                     <Coffee size={18} className="text-primary" />
@@ -421,9 +421,9 @@ export default function ProductsPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-sm">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
                             <div className="flex items-center gap-3">
-                                <div className="size-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+                                <div className="size-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                                     <CheckCircle size={18} className="text-emerald-500" />
                                 </div>
                                 <div>
@@ -432,9 +432,9 @@ export default function ProductsPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-5 shadow-sm">
+                        <div className="bg-white border border-slate-200 rounded-2xl p-4 md:p-5 shadow-sm">
                             <div className="flex items-center gap-3">
-                                <div className="size-10 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
+                                <div className="size-10 rounded-xl bg-rose-50 flex items-center justify-center">
                                     <XCircle size={18} className="text-rose-500" />
                                 </div>
                                 <div>
@@ -454,7 +454,7 @@ export default function ProductsPage() {
                                 placeholder="Search products..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all"
                             />
                         </div>
                         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -466,7 +466,7 @@ export default function ProductsPage() {
                                         "px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all",
                                         filterCategory === cat
                                             ? "bg-primary text-white shadow-md shadow-primary/25"
-                                            : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-500 hover:border-primary/40"
+                                            : "bg-white border border-slate-200 text-slate-500 hover:border-primary/40"
                                     )}
                                 >
                                     {cat}
@@ -474,7 +474,7 @@ export default function ProductsPage() {
                             ))}
                         </div>
                         {/* Status Filter */}
-                        <div className="flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
+                        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1">
                             {(['all', 'available', 'unavailable'] as const).map((status) => (
                                 <button
                                     key={status}
@@ -491,7 +491,7 @@ export default function ProductsPage() {
                             ))}
                         </div>
                         {/* View Toggle */}
-                        <div className="hidden md:flex items-center gap-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
+                        <div className="hidden md:flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1">
                             <button
                                 onClick={() => setViewMode('table')}
                                 className={clsx(
@@ -515,9 +515,9 @@ export default function ProductsPage() {
 
                     {/* ─── Table View ─── */}
                     {viewMode === 'table' && (
-                        <div className="w-full overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm animate-slide-up">
+                        <div className="w-full overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm animate-slide-up">
                             <table className="w-full text-left text-sm min-w-[650px]">
-                                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <thead className="bg-slate-50 border-b border-slate-200">
                                     <tr>
                                         <th className="px-4 md:px-6 py-4 font-bold text-slate-400 uppercase text-[10px] tracking-wider">Product</th>
                                         <th className="px-4 md:px-6 py-4 font-bold text-slate-400 uppercase text-[10px] tracking-wider hidden sm:table-cell">Category</th>
@@ -526,16 +526,16 @@ export default function ProductsPage() {
                                         <th className="px-4 md:px-6 py-4 font-bold text-slate-400 uppercase text-[10px] tracking-wider text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                                <tbody className="divide-y divide-slate-50">
                                     {mounted && filteredProducts.map((product) => (
-                                        <tr key={product.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+                                        <tr key={product.id} className="hover:bg-slate-50/50 transition-colors group">
                                             <td className="px-4 md:px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <ProductImage
                                                         image={product.image}
                                                         name={product.name}
                                                         size="sm"
-                                                        className="size-11 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0"
+                                                        className="size-11 bg-slate-50 rounded-xl border border-slate-200 shrink-0"
                                                     />
                                                     <div>
                                                         <span className="font-bold block">{product.name}</span>
@@ -547,7 +547,7 @@ export default function ProductsPage() {
                                                 </div>
                                             </td>
                                             <td className="px-4 md:px-6 py-4 hidden sm:table-cell">
-                                                <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                                                <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
                                                     <Tag size={10} />
                                                     {product.category}
                                                 </span>
@@ -561,8 +561,8 @@ export default function ProductsPage() {
                                                     className={clsx(
                                                         "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all cursor-pointer",
                                                         product.is_available
-                                                            ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
-                                                            : "bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30"
+                                                            ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                                                            : "bg-rose-50 text-rose-600 hover:bg-rose-100"
                                                     )}
                                                 >
                                                     {product.is_available ? <CheckCircle size={12} /> : <XCircle size={12} />}
@@ -574,14 +574,14 @@ export default function ProductsPage() {
                                                     <button
                                                         onClick={() => openEdit(product)}
                                                         title="Edit product"
-                                                        className="size-8 flex items-center justify-center rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-slate-400 hover:text-blue-600 transition-colors"
+                                                        className="size-8 flex items-center justify-center rounded-lg hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition-colors"
                                                     >
                                                         <Edit3 size={15} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(product.id)}
                                                         title="Delete product"
-                                                        className="size-8 flex items-center justify-center rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-400 hover:text-rose-600 transition-colors"
+                                                        className="size-8 flex items-center justify-center rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
                                                     >
                                                         <Trash2 size={15} />
                                                     </button>
@@ -608,10 +608,10 @@ export default function ProductsPage() {
                                 <div
                                     key={product.id}
                                     className={clsx(
-                                        "bg-white dark:bg-slate-900 border rounded-2xl shadow-sm group card-hover animate-fade-in relative overflow-hidden",
+                                        "bg-white border rounded-2xl shadow-sm group card-hover animate-fade-in relative overflow-hidden",
                                         product.is_available
-                                            ? "border-slate-200 dark:border-slate-800"
-                                            : "border-rose-200 dark:border-rose-900/40 opacity-60"
+                                            ? "border-slate-200"
+                                            : "border-rose-200 opacity-60"
                                     )}
                                     style={{ animationDelay: `${(idx % 10) * 40}ms` }}
                                 >
@@ -622,8 +622,8 @@ export default function ProductsPage() {
                                             className={clsx(
                                                 "size-7 rounded-full flex items-center justify-center transition-all shadow-sm",
                                                 product.is_available
-                                                    ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 hover:bg-emerald-200"
-                                                    : "bg-rose-100 dark:bg-rose-900/30 text-rose-500 hover:bg-rose-200"
+                                                    ? "bg-emerald-100 text-emerald-500 hover:bg-emerald-200"
+                                                    : "bg-rose-100 text-rose-500 hover:bg-rose-200"
                                             )}
                                         >
                                             {product.is_available ? <CheckCircle size={14} /> : <XCircle size={14} />}
@@ -635,7 +635,7 @@ export default function ProductsPage() {
                                         image={product.image}
                                         name={product.name}
                                         size="lg"
-                                        className="aspect-square bg-slate-50 dark:bg-slate-800 group-hover:scale-105 transition-transform"
+                                        className="aspect-square bg-slate-50 group-hover:scale-105 transition-transform"
                                     />
 
                                     {/* Info */}
@@ -643,23 +643,23 @@ export default function ProductsPage() {
                                         <h3 className="font-bold text-sm mb-1 truncate">{product.name}</h3>
                                         <div className="flex items-center justify-between mb-3">
                                             <p className="text-primary font-black text-lg">₱{product.price.toFixed(0)}</p>
-                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-2 py-0.5 rounded-md">
                                                 {product.category}
                                             </span>
                                         </div>
 
                                         {/* Actions */}
-                                        <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100">
                                             <button
                                                 onClick={() => openEdit(product)}
-                                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                             >
                                                 <Edit3 size={13} />
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
-                                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
+                                                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                                             >
                                                 <Trash2 size={13} />
                                                 Delete

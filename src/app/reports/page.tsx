@@ -160,7 +160,7 @@ export default function ReportsPage() {
     };
 
     return (
-        <div className="flex bg-slate-50 dark:bg-background-dark min-h-screen">
+        <div className="flex bg-bg-app min-h-screen">
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header />
@@ -171,7 +171,7 @@ export default function ReportsPage() {
                             <h1 className="text-2xl font-black tracking-tight font-display">Reports</h1>
                             <p className="text-slate-500 text-sm mt-1">Financial overview and sales analytics.</p>
                         </div>
-                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
+                        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1">
                             {(['7d', '30d', 'all'] as DateRange[]).map(range => (
                                 <button
                                     key={range}
@@ -191,22 +191,22 @@ export default function ReportsPage() {
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8 stagger-children">
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm card-hover animate-fade-in">
-                            <div className="size-11 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-500 mb-4">
+                        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm card-hover animate-fade-in">
+                            <div className="size-11 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 mb-4">
                                 <TrendingUp size={20} />
                             </div>
                             <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Revenue</p>
                             <p className="text-2xl font-black tracking-tight">{mounted ? `₱${totalRevenue.toLocaleString('en', { minimumFractionDigits: 2 })}` : '—'}</p>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '80ms' }}>
-                            <div className="size-11 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-500 mb-4">
+                        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '80ms' }}>
+                            <div className="size-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 mb-4">
                                 <TrendingDown size={20} />
                             </div>
                             <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Total Expenses</p>
                             <p className="text-2xl font-black tracking-tight">{mounted ? `₱${totalExpenses.toLocaleString('en', { minimumFractionDigits: 2 })}` : '—'}</p>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '160ms' }}>
-                            <div className={clsx("size-11 rounded-xl flex items-center justify-center mb-4", netProfit >= 0 ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500" : "bg-rose-50 dark:bg-rose-900/20 text-rose-500")}>
+                        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '160ms' }}>
+                            <div className={clsx("size-11 rounded-xl flex items-center justify-center mb-4", netProfit >= 0 ? "bg-emerald-50 text-emerald-500" : "bg-rose-50 text-rose-500")}>
                                 <DollarSign size={20} />
                             </div>
                             <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Net Profit</p>
@@ -214,8 +214,8 @@ export default function ReportsPage() {
                                 {mounted ? `₱${netProfit.toLocaleString('en', { minimumFractionDigits: 2 })}` : '—'}
                             </p>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '240ms' }}>
-                            <div className="size-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 mb-4">
+                        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '240ms' }}>
+                            <div className="size-11 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 mb-4">
                                 <ShoppingBag size={20} />
                             </div>
                             <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Orders ({totalOrders})</p>
@@ -224,8 +224,8 @@ export default function ReportsPage() {
                     </div>
 
                     {/* Export Section */}
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm mb-6 animate-slide-up overflow-hidden">
-                        <div className="px-4 md:px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 animate-slide-up overflow-hidden">
+                        <div className="px-4 md:px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                             <div className="size-9 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
                                 <Download size={16} className="text-white" />
                             </div>
@@ -247,20 +247,20 @@ export default function ReportsPage() {
                                                 className={clsx(
                                                     "w-full text-left px-4 py-3 rounded-xl border transition-all flex items-center gap-3",
                                                     selectedExport === option.value
-                                                        ? "border-primary bg-primary/5 dark:bg-primary/10 dark:border-primary/40"
-                                                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                                                        ? "border-primary bg-primary/5"
+                                                        : "border-slate-200 hover:border-slate-300"
                                                 )}
                                             >
                                                 <div className={clsx(
                                                     "size-8 rounded-lg flex items-center justify-center shrink-0",
                                                     selectedExport === option.value
                                                         ? "bg-primary text-white"
-                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                                                        : "bg-slate-100 text-slate-400"
                                                 )}>
                                                     <FileSpreadsheet size={14} />
                                                 </div>
                                                 <div>
-                                                    <p className={clsx("text-sm font-bold", selectedExport === option.value && "text-primary dark:text-primary")}>{option.label}</p>
+                                                    <p className={clsx("text-sm font-bold", selectedExport === option.value && "text-primary")}>{option.label}</p>
                                                     <p className="text-[10px] text-slate-400">{option.description}</p>
                                                 </div>
                                             </button>
@@ -284,7 +284,7 @@ export default function ReportsPage() {
                                                         type="date"
                                                         value={exportDateFrom}
                                                         onChange={(e) => setExportDateFrom(e.target.value)}
-                                                        className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white dark:bg-slate-800 transition-all"
+                                                        className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white transition-all"
                                                     />
                                                 </div>
                                                 <div>
@@ -293,7 +293,7 @@ export default function ReportsPage() {
                                                         type="date"
                                                         value={exportDateTo}
                                                         onChange={(e) => setExportDateTo(e.target.value)}
-                                                        className="w-full border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white dark:bg-slate-800 transition-all"
+                                                        className="w-full border border-slate-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white transition-all"
                                                     />
                                                 </div>
                                             </div>
@@ -302,7 +302,7 @@ export default function ReportsPage() {
 
                                     {['inventory', 'products'].includes(selectedExport) && (
                                         <div className="mb-6">
-                                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 text-center">
+                                            <div className="bg-slate-50 rounded-xl p-4 text-center">
                                                 <p className="text-xs text-slate-400 font-bold">This export includes all current data</p>
                                                 <p className="text-[10px] text-slate-400 mt-1">No date filter needed</p>
                                             </div>
@@ -310,7 +310,7 @@ export default function ReportsPage() {
                                     )}
 
                                     {/* Preview info */}
-                                    <div className="bg-slate-50 dark:bg-slate-800/30 rounded-xl p-4 mb-4">
+                                    <div className="bg-slate-50 rounded-xl p-4 mb-4">
                                         <p className="text-xs font-bold text-slate-500 mb-2">Export Preview</p>
                                         <div className="flex items-center gap-6 text-sm">
                                             <div>
@@ -339,7 +339,7 @@ export default function ReportsPage() {
 
                                     {/* Success message */}
                                     {exportSuccess && (
-                                        <div className="flex items-center gap-2 text-emerald-600 text-xs font-bold mt-3 animate-fade-in bg-emerald-50 dark:bg-emerald-900/20 rounded-xl px-4 py-3">
+                                        <div className="flex items-center gap-2 text-emerald-600 text-xs font-bold mt-3 animate-fade-in bg-emerald-50 rounded-xl px-4 py-3">
                                             <CheckCircle2 size={14} />
                                             {exportSuccess}
                                         </div>
@@ -352,14 +352,14 @@ export default function ReportsPage() {
                     {/* Details Grid */}
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
                         {/* Top Selling Items */}
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-slide-up">
-                            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-slide-up">
+                            <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                                 <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center">
                                     <Coffee size={16} className="text-primary" />
                                 </div>
                                 <h2 className="text-base font-black font-display">Top Selling Items</h2>
                             </div>
-                            <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                            <div className="divide-y divide-slate-50">
                                 {mounted && topItems.length === 0 ? (
                                     <div className="py-12 text-center text-slate-400 text-sm">
                                         <BarChart3 size={36} className="mx-auto mb-3 opacity-50" />
@@ -385,9 +385,9 @@ export default function ReportsPage() {
                         {/* Payment Breakdown + Expense Categories */}
                         <div className="space-y-6">
                             {/* Payment Methods */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-slide-up" style={{ animationDelay: '100ms' }}>
-                                <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                                    <div className="size-9 rounded-lg bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center">
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-slide-up" style={{ animationDelay: '100ms' }}>
+                                <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                                    <div className="size-9 rounded-lg bg-violet-50 flex items-center justify-center">
                                         <CreditCard size={16} className="text-violet-500" />
                                     </div>
                                     <h2 className="text-base font-black">Payment Methods</h2>
@@ -401,7 +401,7 @@ export default function ReportsPage() {
                                         const pct = totalRevenue > 0 ? (data.total / totalRevenue * 100) : 0;
                                         return (
                                             <div key={method} className="flex items-center gap-3">
-                                                <div className="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 shrink-0">
+                                                <div className="size-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
                                                     <Icon size={16} />
                                                 </div>
                                                 <div className="flex-1">
@@ -409,7 +409,7 @@ export default function ReportsPage() {
                                                         <span className="text-xs font-bold">{method}</span>
                                                         <span className="text-xs font-bold text-slate-400">{data.count} orders • ₱{data.total.toFixed(0)}</span>
                                                     </div>
-                                                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                                                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                                                         <div className="bg-primary h-full rounded-full transition-all" style={{ width: `${pct}%` }} />
                                                     </div>
                                                 </div>
@@ -420,9 +420,9 @@ export default function ReportsPage() {
                             </div>
 
                             {/* Expense by Category */}
-                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-slide-up" style={{ animationDelay: '200ms' }}>
-                                <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                                    <div className="size-9 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-slide-up" style={{ animationDelay: '200ms' }}>
+                                <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                                    <div className="size-9 rounded-lg bg-rose-50 flex items-center justify-center">
                                         <Receipt size={16} className="text-rose-500" />
                                     </div>
                                     <h2 className="text-base font-black">Expenses by Category</h2>

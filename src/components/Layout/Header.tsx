@@ -1,16 +1,13 @@
 "use client";
 
-import { Bell, Search, Clock, Menu, Sun, Moon } from 'lucide-react';
+import { Bell, Search, Clock, Menu } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSidebarStore } from '@/store/useSidebarStore';
-import { useTheme } from 'next-themes';
 
 export default function Header() {
     const [currentTime, setCurrentTime] = useState('');
     const [currentDate, setCurrentDate] = useState('');
-    const [mounted, setMounted] = useState(false);
     const { toggle } = useSidebarStore();
-    const { theme, setTheme } = useTheme();
 
     useEffect(() => {
         const update = () => {
@@ -20,27 +17,26 @@ export default function Header() {
         };
         update();
         const interval = setInterval(update, 1000);
-        setMounted(true);
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <header className="h-14 md:h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between shrink-0">
+        <header className="h-14 md:h-16 border-b border-border bg-white/80 backdrop-blur-xl sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3 flex-1">
                 {/* Hamburger menu - visible on tablet/mobile */}
                 <button
                     onClick={toggle}
-                    className="lg:hidden size-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-primary hover:bg-primary/5 transition-all"
+                    className="lg:hidden size-10 flex items-center justify-center rounded-lg bg-bg-muted border border-border text-text-secondary hover:text-primary hover:border-primary/40 transition-all"
                 >
                     <Menu size={20} />
                 </button>
 
                 <div className="relative max-w-md w-full hidden md:block">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-text-tertiary" />
                     <input
                         type="text"
                         placeholder="Search products, orders..."
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/40 outline-none transition-all placeholder:text-slate-400"
+                        className="w-full bg-bg-muted border border-border rounded-lg py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/25 focus:border-primary/50 outline-none transition-all placeholder:text-text-tertiary"
                     />
                 </div>
             </div>
@@ -48,28 +44,19 @@ export default function Header() {
             <div className="flex items-center gap-3 md:gap-4">
                 {/* Live Clock */}
                 <div className="hidden sm:flex items-center gap-2 text-right">
-                    <Clock size={16} className="text-slate-400" />
+                    <Clock size={16} className="text-text-tertiary" />
                     <div>
-                        <p className="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none">{currentTime}</p>
-                        <p className="text-[10px] text-slate-400 leading-none mt-0.5">{currentDate}</p>
+                        <p className="text-xs font-bold text-text-primary leading-none">{currentTime}</p>
+                        <p className="text-[10px] text-text-tertiary leading-none mt-0.5">{currentDate}</p>
                     </div>
                 </div>
 
-                <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 hidden sm:block" />
-
-                {/* Theme Toggle */}
-                <button
-                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className="size-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
-                >
-                    {mounted && (theme === 'dark' ? <Moon size={18} /> : <Sun size={18} />)}
-                    {!mounted && <Sun size={18} />}
-                </button>
+                <div className="w-px h-8 bg-border hidden sm:block" />
 
                 {/* Notification Bell */}
-                <button className="size-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all relative">
+                <button className="size-10 flex items-center justify-center rounded-lg bg-bg-muted border border-border text-text-secondary hover:bg-primary/10 hover:text-primary hover:border-primary/40 transition-all relative">
                     <Bell size={18} />
-                    <span className="absolute top-2 right-2 size-2.5 bg-rose-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
+                    <span className="absolute top-2 right-2 size-2.5 bg-error rounded-full border-2 border-white animate-pulse" />
                 </button>
             </div>
         </header>
