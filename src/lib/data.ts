@@ -292,21 +292,41 @@ export async function deleteExpense(id: string): Promise<void> {
     if (error) console.error('Error deleting expense:', error);
 }
 
+// ─────────── Helpers ───────────
+/** Returns the local date string (YYYY-MM-DD) and ISO boundaries for "today" in the user's timezone. */
+function getLocalToday() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const today = `${year}-${month}-${day}`;
+
+    // Build start/end of day as local Date objects, then convert to ISO for Supabase queries
+    const startOfDay = new Date(year, now.getMonth(), now.getDate(), 0, 0, 0);
+    const endOfDay = new Date(year, now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    return {
+        dateStr: today,
+        startISO: startOfDay.toISOString(),
+        endISO: endOfDay.toISOString(),
+    };
+}
+
 // ─────────── Dashboard Stats ───────────
 export async function getTodayStats() {
-    const today = new Date().toISOString().slice(0, 10);
+    const { dateStr, startISO, endISO } = getLocalToday();
 
     const [ordersResult, expensesResult] = await Promise.all([
         supabase
             .from('orders')
             .select('total')
-            .gte('created_at', `${today}T00:00:00`)
-            .lte('created_at', `${today}T23:59:59`)
+            .gte('created_at', startISO)
+            .lte('created_at', endISO)
             .neq('status', 'Cancelled'),
         supabase
             .from('expenses')
             .select('amount')
-            .eq('date', today),
+            .eq('date', dateStr),
     ]);
 
     const orders = ordersResult.data || [];
@@ -344,14 +364,14 @@ export async function getRecentOrders(limit = 10): Promise<Order[]> {
 }
 
 export async function getHourlySales(): Promise<{ name: string; sales: number }[]> {
-    const today = new Date().toISOString().slice(0, 10);
+    const { startISO, endISO } = getLocalToday();
     const currentHour = new Date().getHours();
 
     const { data, error } = await supabase
         .from('orders')
         .select('total, created_at')
-        .gte('created_at', `${today}T00:00:00`)
-        .lte('created_at', `${today}T23:59:59`)
+        .gte('created_at', startISO)
+        .lte('created_at', endISO)
         .neq('status', 'Cancelled');
 
     if (error) {
@@ -361,7 +381,7 @@ export async function getHourlySales(): Promise<{ name: string; sales: number }[
 
     const orders = data || [];
 
-    // Aggregate totals by hour
+    // Aggregate totals by hour (using local hours)
     const hourlyMap: Record<number, number> = {};
     for (const order of orders) {
         const hour = new Date(order.created_at).getHours();
