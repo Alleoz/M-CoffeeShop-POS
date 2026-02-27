@@ -18,6 +18,7 @@ const ROUTE_PERMISSIONS: Record<string, Role[]> = {
     '/inventory': ['admin', 'manager'],
     '/reports': ['admin', 'manager'],
     '/expenses': ['admin', 'manager'],
+    '/attendance': ['admin', 'manager', 'cashier', 'barista'],
     '/staff': ['admin'],
 };
 

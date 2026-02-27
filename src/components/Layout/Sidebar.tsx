@@ -14,6 +14,7 @@ import {
     FileBarChart,
     Receipt,
     Users,
+    Clock,
     LogOut,
     X,
 } from 'lucide-react';
@@ -28,6 +29,7 @@ const navItems = [
     { name: 'Inventory', href: '/inventory', icon: Boxes, roles: ['admin', 'manager'] as Role[] },
     { name: 'Reports', href: '/reports', icon: FileBarChart, roles: ['admin', 'manager'] as Role[] },
     { name: 'Expenses', href: '/expenses', icon: Receipt, roles: ['admin', 'manager'] as Role[] },
+    { name: 'Attendance', href: '/attendance', icon: Clock, roles: ['admin', 'manager', 'cashier', 'barista'] as Role[] },
     { name: 'Staff', href: '/staff', icon: Users, roles: ['admin'] as Role[] },
 ];
 
