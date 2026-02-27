@@ -80,7 +80,7 @@ export default function Sidebar() {
                             <Coffee size={20} className="text-text-on-primary" />
                         </div>
                         <div>
-                            <span className="font-extrabold text-lg tracking-tight leading-none block text-text-primary">M Café</span>
+                            <span className="font-extrabold text-lg tracking-tight leading-none block text-text-primary">M Café & Thrift Shop</span>
                             <span className="text-[10px] text-text-tertiary font-bold uppercase tracking-[0.15em]">POS System</span>
                         </div>
                     </div>
