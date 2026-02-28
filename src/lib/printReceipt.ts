@@ -59,7 +59,7 @@ export function generateReceiptText(order: Order): string {
 
     // Header
     lines.push('');
-    lines.push(center('M COFFEE SHOP'));
+    lines.push(center('M Café & Thrift Shop'));
     lines.push(center('~ ~ ~ ~ ~ ~ ~'));
     lines.push('');
     lines.push(center('Thank you for'));

@@ -93,8 +93,8 @@ export default function LoginPage() {
                     <div className="inline-flex items-center justify-center size-20 bg-primary rounded-3xl shadow-2xl shadow-primary/30 mb-5">
                         <Coffee size={36} className="text-white" />
                     </div>
-                    <h1 className="text-3xl font-black text-white tracking-tight font-display">M Coffee</h1>
-                    <p className="text-slate-400 text-sm mt-1 font-medium">Point of Sale System</p>
+                    <h1 className="text-3xl font-black text-white tracking-tight font-display">M Café & Thrift Shop</h1>
+                    <p className="text-slate-400 text-sm mt-1 font-medium">Point of Sale</p>
                 </div>
 
                 {/* Login Card */}
@@ -125,8 +125,8 @@ export default function LoginPage() {
                                     <div
                                         key={i}
                                         className={`size-14 rounded-2xl border-2 flex items-center justify-center text-2xl font-black transition-all duration-200 ${pin.length > i
-                                                ? 'border-primary bg-primary/10 text-primary scale-105'
-                                                : 'border-white/10 bg-white/5 text-transparent'
+                                            ? 'border-primary bg-primary/10 text-primary scale-105'
+                                            : 'border-white/10 bg-white/5 text-transparent'
                                             }`}
                                     >
                                         {pin.length > i ? (showPin ? pin[i] : '●') : ''}
