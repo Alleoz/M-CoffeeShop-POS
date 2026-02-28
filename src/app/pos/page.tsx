@@ -7,6 +7,7 @@ import Modal from '@/components/UI/Modal';
 import ProductImage from '@/components/UI/ProductImage';
 import { useCartStore } from '@/store/useCartStore';
 import { getProducts, createOrder } from '@/lib/data';
+import { printReceipt } from '@/lib/printReceipt';
 import { Product, Order } from '@/types/database';
 import {
     User,
@@ -252,7 +253,7 @@ export default function POSPage() {
                             </div>
 
                             <div className="flex gap-3 mt-6">
-                                <button onClick={() => window.print()} className="flex-1 py-3.5 rounded-full border border-border font-bold text-sm text-text-secondary hover:bg-bg-muted transition-colors flex items-center justify-center gap-2">
+                                <button onClick={() => printReceipt(completedOrder)} className="flex-1 py-3.5 rounded-full border border-border font-bold text-sm text-text-secondary hover:bg-bg-muted transition-colors flex items-center justify-center gap-2">
                                     <Printer size={16} />
                                     Print Receipt
                                 </button>
