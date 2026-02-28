@@ -193,7 +193,7 @@ export default function LoginPage() {
 
                 {/* Footer */}
                 <p className="text-center text-slate-600 text-[10px] mt-8 font-medium">
-                    M Coffee Shop POS System &copy; {new Date().getFullYear()}
+                    M Café & Thrift Shop POS System &copy; {new Date().getFullYear()}
                 </p>
             </div>
         </div>

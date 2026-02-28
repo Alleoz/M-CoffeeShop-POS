@@ -3,13 +3,13 @@ import "./globals.css";
 import AuthGuard from "@/components/Auth/AuthGuard";
 
 export const metadata: Metadata = {
-    title: "M Coffee Shop POS",
-    description: "Modern POS for M Coffee Shop",
+    title: "M Café & Thrift Shop",
+    description: "Modern POS for M Café & Thrift Shop",
     manifest: "/manifest.json",
     appleWebApp: {
         capable: true,
         statusBarStyle: "black-translucent",
-        title: "M Coffee POS",
+        title: "M Café POS",
     },
 };
 
