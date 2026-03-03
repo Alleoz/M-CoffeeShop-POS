@@ -3,11 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useOwnerAuthStore } from '@/store/useOwnerAuthStore';
 import { Coffee } from 'lucide-react';
 
-const PUBLIC_ROUTES = ['/login'];
+// Routes that don't require ANY authentication
+const FULLY_PUBLIC_ROUTES = ['/owner-auth'];
 
-// Role-based route access
+// Routes that require owner auth but NOT staff auth
+const OWNER_ONLY_ROUTES = ['/login'];
+
+// Role-based route access (requires both owner + staff auth)
 type Role = 'admin' | 'manager' | 'cashier' | 'barista';
 
 const ROUTE_PERMISSIONS: Record<string, Role[]> = {
@@ -40,28 +45,51 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const { isAuthenticated, staff, checkAuth } = useAuthStore();
+    const { checkOwnerAuth } = useOwnerAuthStore();
     const [checking, setChecking] = useState(true);
 
     useEffect(() => {
         const verify = async () => {
-            const isAuth = await checkAuth();
-            const isPublic = PUBLIC_ROUTES.includes(pathname);
+            const isFullyPublic = FULLY_PUBLIC_ROUTES.includes(pathname);
+            const isOwnerOnlyRoute = OWNER_ONLY_ROUTES.includes(pathname);
 
-            if (!isAuth && !isPublic) {
-                router.replace('/login');
-            } else if (isAuth && isPublic) {
-                // Redirect to the appropriate default page based on role
-                const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
-                router.replace(getDefaultRoute(role));
-            } else if (isAuth && !isPublic) {
-                // Check role-based access
-                const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
-                const basePath = '/' + pathname.split('/').filter(Boolean)[0];
-                const allowedRoles = ROUTE_PERMISSIONS[basePath];
+            // Check owner auth (synchronous — from localStorage)
+            const isOwnerAuth = checkOwnerAuth();
 
-                if (allowedRoles && !allowedRoles.includes(role)) {
-                    // Redirect to their default route if unauthorized
+            // Check staff auth (async — Supabase session)
+            const isStaffAuth = await checkAuth();
+
+            if (isFullyPublic) {
+                // On owner-auth page: if already owner-authenticated, go to staff login
+                if (isOwnerAuth && isStaffAuth) {
+                    const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
                     router.replace(getDefaultRoute(role));
+                } else if (isOwnerAuth) {
+                    router.replace('/login');
+                }
+            } else if (isOwnerOnlyRoute) {
+                // On /login page: needs owner auth, but NOT staff auth
+                if (!isOwnerAuth) {
+                    router.replace('/owner-auth');
+                } else if (isStaffAuth) {
+                    const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
+                    router.replace(getDefaultRoute(role));
+                }
+            } else {
+                // Protected routes: need BOTH owner + staff auth
+                if (!isOwnerAuth) {
+                    router.replace('/owner-auth');
+                } else if (!isStaffAuth) {
+                    router.replace('/login');
+                } else {
+                    // Check role-based access
+                    const role = (useAuthStore.getState().staff?.role || 'cashier') as Role;
+                    const basePath = '/' + pathname.split('/').filter(Boolean)[0];
+                    const allowedRoles = ROUTE_PERMISSIONS[basePath];
+
+                    if (allowedRoles && !allowedRoles.includes(role)) {
+                        router.replace(getDefaultRoute(role));
+                    }
                 }
             }
 
@@ -69,7 +97,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         };
 
         verify();
-    }, [pathname, checkAuth, router]);
+    }, [pathname, checkAuth, checkOwnerAuth, router]);
 
     // Show loading screen while checking auth
     if (checking) {
@@ -85,12 +113,17 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         );
     }
 
-    // On public routes, render without auth check
-    if (PUBLIC_ROUTES.includes(pathname)) {
+    // On fully public routes, render without any auth check
+    if (FULLY_PUBLIC_ROUTES.includes(pathname)) {
         return <>{children}</>;
     }
 
-    // On protected routes, only render if authenticated
+    // On owner-only routes (login), render if owner is authenticated
+    if (OWNER_ONLY_ROUTES.includes(pathname)) {
+        return <>{children}</>;
+    }
+
+    // On protected routes, only render if both are authenticated
     if (!isAuthenticated) {
         return null;
     }
