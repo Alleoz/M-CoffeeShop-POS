@@ -15,15 +15,23 @@ import {
     Trash2,
     Tag,
     FileText,
+    Filter,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const expenseCategories = ['Supplies', 'Utilities', 'Marketing', 'Maintenance', 'Salaries', 'Rent', 'Miscellaneous'];
 
+type FilterRange = 'today' | '7d' | '30d' | 'all' | 'custom';
+
 export default function ExpensesPage() {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [showAdd, setShowAdd] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    // Date filter
+    const [filterRange, setFilterRange] = useState<FilterRange>('all');
+    const [customDateFrom, setCustomDateFrom] = useState('');
+    const [customDateTo, setCustomDateTo] = useState('');
 
     // Form
     const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
@@ -37,8 +45,40 @@ export default function ExpensesPage() {
     };
 
     useEffect(() => {
-        refreshExpenses().then(() => setMounted(true));
+        refreshExpenses().then(() => {
+            setMounted(true);
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+            const today = now.toISOString().slice(0, 10);
+            setCustomDateFrom(firstDay);
+            setCustomDateTo(today);
+        });
     }, []);
+
+    // Filtered expenses based on date range
+    const filteredExpenses = useMemo(() => {
+        if (filterRange === 'all') return expenses;
+        if (filterRange === 'custom') {
+            return expenses.filter(e => {
+                if (customDateFrom && e.date < customDateFrom) return false;
+                if (customDateTo && e.date > customDateTo) return false;
+                return true;
+            });
+        }
+        const today = new Date().toISOString().slice(0, 10);
+        if (filterRange === 'today') {
+            return expenses.filter(e => e.date === today);
+        }
+        const days = filterRange === '7d' ? 7 : 30;
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - days);
+        const cutoffStr = cutoff.toISOString().slice(0, 10);
+        return expenses.filter(e => e.date >= cutoffStr);
+    }, [expenses, filterRange, customDateFrom, customDateTo]);
+
+    const totalFilteredExpenses = useMemo(() => {
+        return filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+    }, [filteredExpenses]);
 
     const totalMonthExpenses = useMemo(() => {
         const currentMonth = new Date().toISOString().slice(0, 7);
@@ -107,7 +147,7 @@ export default function ExpensesPage() {
                     </div>
 
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 stagger-children">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 stagger-children">
                         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm card-hover animate-fade-in">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="size-11 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500">
@@ -126,6 +166,56 @@ export default function ExpensesPage() {
                             </div>
                             <p className="text-3xl font-black tracking-tight">₱{mounted ? totalTodayExpenses.toLocaleString('en', { minimumFractionDigits: 2 }) : '—'}</p>
                         </div>
+                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '160ms' }}>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="size-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500">
+                                    <Filter size={20} />
+                                </div>
+                                <span className="font-bold text-slate-400 text-sm">Filtered Total</span>
+                            </div>
+                            <p className="text-3xl font-black tracking-tight">₱{mounted ? totalFilteredExpenses.toLocaleString('en', { minimumFractionDigits: 2 }) : '—'}</p>
+                            <p className="text-[10px] text-slate-400 font-bold mt-1">{filteredExpenses.length} records</p>
+                        </div>
+                    </div>
+
+                    {/* Date Range Filter */}
+                    <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm animate-slide-up">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                            <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl p-1">
+                                {(['today', '7d', '30d', 'all', 'custom'] as FilterRange[]).map(range => (
+                                    <button
+                                        key={range}
+                                        onClick={() => setFilterRange(range)}
+                                        className={clsx(
+                                            "px-3 py-2 rounded-lg text-xs font-bold transition-all",
+                                            filterRange === range
+                                                ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                                : "text-slate-500 hover:text-slate-700"
+                                        )}
+                                    >
+                                        {range === 'today' ? 'Today' : range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === 'all' ? 'All' : 'Custom'}
+                                    </button>
+                                ))}
+                            </div>
+                            {filterRange === 'custom' && (
+                                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5 animate-fade-in">
+                                    <Calendar size={14} className="text-primary shrink-0" />
+                                    <input
+                                        type="date"
+                                        value={customDateFrom}
+                                        onChange={(e) => setCustomDateFrom(e.target.value)}
+                                        className="border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                    />
+                                    <span className="text-xs text-slate-300 font-bold">→</span>
+                                    <input
+                                        type="date"
+                                        value={customDateTo}
+                                        onChange={(e) => setCustomDateTo(e.target.value)}
+                                        className="border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Expenses Table */}
@@ -142,7 +232,7 @@ export default function ExpensesPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-50">
-                                    {mounted && expenses.map((expense) => (
+                                    {mounted && filteredExpenses.map((expense) => (
                                         <tr key={expense.id} className="hover:bg-slate-50/50 transition-colors group">
                                             <td className="px-4 md:px-6 py-4 text-slate-600 font-medium">
                                                 <div className="flex items-center gap-2">
@@ -171,11 +261,11 @@ export default function ExpensesPage() {
                                 </tbody>
                             </table>
                         </div>
-                        {mounted && expenses.length === 0 && (
+                        {mounted && filteredExpenses.length === 0 && (
                             <div className="py-16 text-center text-slate-400">
                                 <Wallet size={40} className="mx-auto mb-3 opacity-50" />
-                                <p className="text-sm font-bold">No expenses logged yet</p>
-                                <p className="text-xs mt-1">Click &quot;Log Expense&quot; to start tracking.</p>
+                                <p className="text-sm font-bold">{expenses.length === 0 ? 'No expenses logged yet' : 'No expenses match this filter'}</p>
+                                <p className="text-xs mt-1">{expenses.length === 0 ? 'Click "Log Expense" to start tracking.' : 'Try changing the date range.'}</p>
                             </div>
                         )}
                     </div>

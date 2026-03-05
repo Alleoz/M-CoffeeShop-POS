@@ -17,6 +17,7 @@ import {
     Clock,
     LogOut,
     X,
+    History,
 } from 'lucide-react';
 
 type Role = 'admin' | 'manager' | 'cashier' | 'barista';
@@ -24,6 +25,7 @@ type Role = 'admin' | 'manager' | 'cashier' | 'barista';
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'manager'] as Role[] },
     { name: 'New Order', href: '/pos', icon: ShoppingCart, roles: ['admin', 'manager', 'cashier'] as Role[] },
+    { name: 'Order History', href: '/orders', icon: History, roles: ['admin', 'manager', 'cashier'] as Role[] },
     { name: 'Products', href: '/products', icon: Coffee, roles: ['admin', 'manager'] as Role[] },
     { name: 'Barista KDS', href: '/barista', icon: ChefHat, roles: ['admin', 'manager', 'barista'] as Role[] },
     { name: 'Inventory', href: '/inventory', icon: Boxes, roles: ['admin', 'manager'] as Role[] },

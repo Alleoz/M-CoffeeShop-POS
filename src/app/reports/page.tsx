@@ -32,12 +32,14 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
-type DateRange = '7d' | '30d' | 'all';
+type DateRange = '7d' | '30d' | 'all' | 'custom';
 
 export default function ReportsPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [dateRange, setDateRange] = useState<DateRange>('30d');
+    const [customDateFrom, setCustomDateFrom] = useState('');
+    const [customDateTo, setCustomDateTo] = useState('');
     const [mounted, setMounted] = useState(false);
 
     // Export state
@@ -62,25 +64,43 @@ export default function ReportsPage() {
             const today = now.toISOString().slice(0, 10);
             setExportDateFrom(firstDay);
             setExportDateTo(today);
+            setCustomDateFrom(firstDay);
+            setCustomDateTo(today);
         };
         loadData();
     }, []);
 
     const filteredOrders = useMemo(() => {
         if (dateRange === 'all') return orders.filter(o => o.status !== 'Cancelled');
+        if (dateRange === 'custom') {
+            return orders.filter(o => {
+                if (o.status === 'Cancelled') return false;
+                const d = new Date(o.created_at).toISOString().split('T')[0];
+                if (customDateFrom && d < customDateFrom) return false;
+                if (customDateTo && d > customDateTo) return false;
+                return true;
+            });
+        }
         const days = dateRange === '7d' ? 7 : 30;
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - days);
         return orders.filter(o => new Date(o.created_at) >= cutoff && o.status !== 'Cancelled');
-    }, [orders, dateRange]);
+    }, [orders, dateRange, customDateFrom, customDateTo]);
 
     const filteredExpenses = useMemo(() => {
         if (dateRange === 'all') return expenses;
+        if (dateRange === 'custom') {
+            return expenses.filter(e => {
+                if (customDateFrom && e.date < customDateFrom) return false;
+                if (customDateTo && e.date > customDateTo) return false;
+                return true;
+            });
+        }
         const days = dateRange === '7d' ? 7 : 30;
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - days);
         return expenses.filter(e => new Date(e.date) >= cutoff);
-    }, [expenses, dateRange]);
+    }, [expenses, dateRange, customDateFrom, customDateTo]);
 
     const totalRevenue = filteredOrders.reduce((sum, o) => sum + o.total, 0);
     const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -171,21 +191,41 @@ export default function ReportsPage() {
                             <h1 className="text-2xl font-black tracking-tight font-display">Reports</h1>
                             <p className="text-slate-500 text-sm mt-1">Financial overview and sales analytics.</p>
                         </div>
-                        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1">
-                            {(['7d', '30d', 'all'] as DateRange[]).map(range => (
-                                <button
-                                    key={range}
-                                    onClick={() => setDateRange(range)}
-                                    className={clsx(
-                                        "px-4 py-2 rounded-lg text-xs font-bold transition-all",
-                                        dateRange === range
-                                            ? "bg-primary text-white shadow-lg shadow-primary/25"
-                                            : "text-slate-500 hover:text-slate-700"
-                                    )}
-                                >
-                                    {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : 'All Time'}
-                                </button>
-                            ))}
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1">
+                                {(['7d', '30d', 'all', 'custom'] as DateRange[]).map(range => (
+                                    <button
+                                        key={range}
+                                        onClick={() => setDateRange(range)}
+                                        className={clsx(
+                                            "px-4 py-2 rounded-lg text-xs font-bold transition-all",
+                                            dateRange === range
+                                                ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                                : "text-slate-500 hover:text-slate-700"
+                                        )}
+                                    >
+                                        {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === 'all' ? 'All Time' : 'Custom'}
+                                    </button>
+                                ))}
+                            </div>
+                            {dateRange === 'custom' && (
+                                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5 animate-fade-in">
+                                    <Calendar size={14} className="text-primary shrink-0" />
+                                    <input
+                                        type="date"
+                                        value={customDateFrom}
+                                        onChange={(e) => setCustomDateFrom(e.target.value)}
+                                        className="border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                    />
+                                    <span className="text-xs text-slate-300 font-bold">→</span>
+                                    <input
+                                        type="date"
+                                        value={customDateTo}
+                                        onChange={(e) => setCustomDateTo(e.target.value)}
+                                        className="border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
 

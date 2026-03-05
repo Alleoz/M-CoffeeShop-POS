@@ -82,14 +82,29 @@ export default function AttendancePage() {
     const [weekOffset, setWeekOffset] = useState(0);
     const [viewMode, setViewMode] = useState<'my' | 'all'>(isAdmin ? 'all' : 'my');
 
+    // Date mode - week or custom
+    const [dateMode, setDateMode] = useState<'week' | 'custom'>('week');
+    const [customDateFrom, setCustomDateFrom] = useState(() => {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    });
+    const [customDateTo, setCustomDateTo] = useState(() => {
+        return new Date().toISOString().split('T')[0];
+    });
+
     const week = getWeekRange(weekOffset);
+
+    // Determine active date range based on mode
+    const activeDateRange = dateMode === 'week'
+        ? { from: week.from, to: week.to }
+        : { from: customDateFrom, to: customDateTo };
 
     // Fetch attendance records
     const fetchRecords = useCallback(async () => {
         if (!staff) return;
         setLoading(true);
         try {
-            const params = new URLSearchParams({ from: week.from, to: week.to });
+            const params = new URLSearchParams({ from: activeDateRange.from, to: activeDateRange.to });
             if (viewMode === 'all' && isAdmin) {
                 params.set('all', 'true');
             } else {
@@ -104,7 +119,7 @@ export default function AttendancePage() {
         } finally {
             setLoading(false);
         }
-    }, [staff, week.from, week.to, viewMode, isAdmin]);
+    }, [staff, activeDateRange.from, activeDateRange.to, viewMode, isAdmin]);
 
     // Check current clock-in status
     const checkStatus = useCallback(async () => {
@@ -289,33 +304,74 @@ export default function AttendancePage() {
                         </div>
                     </div>
 
-                    {/* Controls: Week navigation + View toggle */}
+                    {/* Controls: Date mode + navigation + View toggle */}
                     <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => setWeekOffset(w => w - 1)}
-                                className="size-9 flex items-center justify-center rounded-xl border border-border-light bg-white hover:bg-bg-muted text-text-secondary transition"
-                            >
-                                <ChevronLeft size={16} />
-                            </button>
-                            <div className="px-4 py-2 rounded-xl bg-white border border-border-light text-sm font-bold text-text-primary min-w-[200px] text-center">
-                                <Calendar size={14} className="inline mr-2 text-primary" />
-                                {week.label}
-                            </div>
-                            <button
-                                onClick={() => setWeekOffset(w => Math.min(w + 1, 0))}
-                                disabled={weekOffset >= 0}
-                                className="size-9 flex items-center justify-center rounded-xl border border-border-light bg-white hover:bg-bg-muted text-text-secondary transition disabled:opacity-30"
-                            >
-                                <ChevronRight size={16} />
-                            </button>
-                            {weekOffset !== 0 && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {/* Date Mode Toggle */}
+                            <div className="flex items-center bg-white border border-border-light rounded-xl p-1">
                                 <button
-                                    onClick={() => setWeekOffset(0)}
-                                    className="text-xs font-bold text-primary hover:underline ml-1"
+                                    onClick={() => setDateMode('week')}
+                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${dateMode === 'week' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-text-secondary hover:bg-bg-muted'}`}
                                 >
-                                    This Week
+                                    Weekly
                                 </button>
+                                <button
+                                    onClick={() => setDateMode('custom')}
+                                    className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${dateMode === 'custom' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'text-text-secondary hover:bg-bg-muted'}`}
+                                >
+                                    Custom
+                                </button>
+                            </div>
+
+                            {/* Week navigation - only when dateMode is 'week' */}
+                            {dateMode === 'week' && (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setWeekOffset(w => w - 1)}
+                                        className="size-9 flex items-center justify-center rounded-xl border border-border-light bg-white hover:bg-bg-muted text-text-secondary transition"
+                                    >
+                                        <ChevronLeft size={16} />
+                                    </button>
+                                    <div className="px-4 py-2 rounded-xl bg-white border border-border-light text-sm font-bold text-text-primary min-w-[200px] text-center">
+                                        <Calendar size={14} className="inline mr-2 text-primary" />
+                                        {week.label}
+                                    </div>
+                                    <button
+                                        onClick={() => setWeekOffset(w => Math.min(w + 1, 0))}
+                                        disabled={weekOffset >= 0}
+                                        className="size-9 flex items-center justify-center rounded-xl border border-border-light bg-white hover:bg-bg-muted text-text-secondary transition disabled:opacity-30"
+                                    >
+                                        <ChevronRight size={16} />
+                                    </button>
+                                    {weekOffset !== 0 && (
+                                        <button
+                                            onClick={() => setWeekOffset(0)}
+                                            className="text-xs font-bold text-primary hover:underline ml-1"
+                                        >
+                                            This Week
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Custom date range - only when dateMode is 'custom' */}
+                            {dateMode === 'custom' && (
+                                <div className="flex items-center gap-2 bg-white border border-border-light rounded-xl px-3 py-1.5 animate-fade-in">
+                                    <Calendar size={14} className="text-primary shrink-0" />
+                                    <input
+                                        type="date"
+                                        value={customDateFrom}
+                                        onChange={(e) => setCustomDateFrom(e.target.value)}
+                                        className="border border-border-light rounded-lg py-1.5 px-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                    />
+                                    <span className="text-xs text-text-tertiary font-bold">→</span>
+                                    <input
+                                        type="date"
+                                        value={customDateTo}
+                                        onChange={(e) => setCustomDateTo(e.target.value)}
+                                        className="border border-border-light rounded-lg py-1.5 px-2.5 text-xs outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 bg-white transition-all"
+                                    />
+                                </div>
                             )}
                         </div>
 
