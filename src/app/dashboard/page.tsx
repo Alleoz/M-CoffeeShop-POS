@@ -97,7 +97,7 @@ export default function Dashboard() {
                     >
                         <div>
                             <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">Good day! ☕</h1>
-                            <p className="text-text-secondary text-sm mt-1">Here&apos;s what&apos;s happening at M Coffee Shop today.</p>
+                            <p className="text-text-secondary text-sm mt-1">Here&apos;s what&apos;s happening at M Café & Thrift Shop today.</p>
                         </div>
                     </motion.div>
 

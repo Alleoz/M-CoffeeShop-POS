@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Sidebar from '@/components/Layout/Sidebar';
 import Header from '@/components/Layout/Header';
 import Modal from '@/components/UI/Modal';
@@ -85,6 +85,24 @@ export default function ExpensesPage() {
         return expenses.filter(e => e.date.startsWith(currentMonth)).reduce((sum, e) => sum + e.amount, 0);
     }, [expenses]);
 
+    // Dynamic label for the filtered total card
+    const filteredLabel = useMemo(() => {
+        switch (filterRange) {
+            case 'today': return "Today's Total";
+            case '7d': return 'Last 7 Days';
+            case '30d': return 'Last 30 Days';
+            case 'all': return 'All-Time Total';
+            case 'custom': {
+                if (customDateFrom && customDateTo) {
+                    const fmt = (d: string) => new Date(d + 'T00:00:00').toLocaleDateString('en-PH', { month: 'short', day: 'numeric' });
+                    return `${fmt(customDateFrom)} – ${fmt(customDateTo)}`;
+                }
+                return 'Custom Range';
+            }
+            default: return 'Filtered Total';
+        }
+    }, [filterRange, customDateFrom, customDateTo]);
+
     const totalTodayExpenses = useMemo(() => {
         const today = new Date().toISOString().slice(0, 10);
         return expenses.filter(e => e.date === today).reduce((sum, e) => sum + e.amount, 0);
@@ -166,15 +184,15 @@ export default function ExpensesPage() {
                             </div>
                             <p className="text-3xl font-black tracking-tight">₱{mounted ? totalTodayExpenses.toLocaleString('en', { minimumFractionDigits: 2 }) : '—'}</p>
                         </div>
-                        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm card-hover animate-fade-in" style={{ animationDelay: '160ms' }}>
+                        <div className={`bg-white border rounded-2xl p-6 shadow-sm card-hover animate-fade-in ${filterRange === 'custom' ? 'border-violet-300 ring-2 ring-violet-100' : 'border-slate-200'}`} style={{ animationDelay: '160ms' }}>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="size-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-500">
+                                <div className={`size-11 rounded-xl flex items-center justify-center ${filterRange === 'custom' ? 'bg-violet-100 text-violet-600' : 'bg-violet-50 text-violet-500'}`}>
                                     <Filter size={20} />
                                 </div>
-                                <span className="font-bold text-slate-400 text-sm">Filtered Total</span>
+                                <span className={`font-bold text-sm ${filterRange === 'custom' ? 'text-violet-600' : 'text-slate-400'}`}>{filteredLabel}</span>
                             </div>
                             <p className="text-3xl font-black tracking-tight">₱{mounted ? totalFilteredExpenses.toLocaleString('en', { minimumFractionDigits: 2 }) : '—'}</p>
-                            <p className="text-[10px] text-slate-400 font-bold mt-1">{filteredExpenses.length} records</p>
+                            <p className="text-[10px] text-slate-400 font-bold mt-1">{filteredExpenses.length} record{filteredExpenses.length !== 1 ? 's' : ''}</p>
                         </div>
                     </div>
 

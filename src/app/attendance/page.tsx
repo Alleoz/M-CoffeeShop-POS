@@ -218,25 +218,30 @@ export default function AttendancePage() {
 
                     {/* Clock In/Out Card — only for non-admin */}
                     {!isAdmin && (
-                        <div className="bg-white border border-border-light rounded-3xl p-6 mb-6 shadow-sm">
+                        <div className={`border rounded-3xl p-6 mb-6 shadow-sm transition-all ${clockedIn ? 'bg-emerald-50/50 border-emerald-200' : 'bg-white border-border-light'}`}>
                             <div className="flex flex-col sm:flex-row items-center gap-6">
                                 {/* Status indicator */}
                                 <div className="flex items-center gap-4 flex-1">
-                                    <div className={`size-14 rounded-2xl flex items-center justify-center ${clockedIn ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
-                                        }`}>
-                                        {clockedIn ? <Timer size={28} /> : <Coffee size={28} />}
+                                    <div className="relative">
+                                        <div className={`size-14 rounded-2xl flex items-center justify-center ${clockedIn ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                                            }`}>
+                                            {clockedIn ? <Timer size={28} /> : <Coffee size={28} />}
+                                        </div>
+                                        {clockedIn && (
+                                            <span className="absolute -top-1 -right-1 size-4 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
+                                        )}
                                     </div>
                                     <div>
                                         <p className="text-lg font-extrabold text-text-primary">
-                                            {clockedIn ? 'Currently Working' : 'Not Clocked In'}
+                                            {clockedIn ? '🟢 Currently On Shift' : 'Not Clocked In'}
                                         </p>
                                         {clockedIn && currentSession && (
                                             <p className="text-sm text-text-tertiary">
-                                                Since {formatTime(currentSession.clock_in)} · <span className="font-bold text-primary">{formatDuration(elapsedMinutes)}</span> elapsed
+                                                Started at {formatTime(currentSession.clock_in)} · <span className="font-bold text-primary">{formatDuration(elapsedMinutes)}</span> elapsed
                                             </p>
                                         )}
                                         {!clockedIn && (
-                                            <p className="text-sm text-text-tertiary">Tap the button to start your shift</p>
+                                            <p className="text-sm text-text-tertiary">Tap the button below to start your shift</p>
                                         )}
                                     </div>
                                 </div>
@@ -245,20 +250,25 @@ export default function AttendancePage() {
                                 <button
                                     onClick={() => handleClock(clockedIn ? 'clock_out' : 'clock_in')}
                                     disabled={actionLoading}
-                                    className={`flex items-center gap-2 px-8 py-3.5 rounded-2xl font-bold text-sm shadow-button transition-all active:scale-95 disabled:opacity-50 ${clockedIn
-                                        ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                                        : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                                    className={`flex items-center gap-2.5 px-8 py-4 rounded-2xl font-bold text-sm shadow-button transition-all active:scale-95 disabled:opacity-50 ${clockedIn
+                                        ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-rose-500/25'
+                                        : 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/25'
                                         }`}
                                 >
                                     {actionLoading ? (
                                         <Loader2 size={18} className="animate-spin" />
                                     ) : clockedIn ? (
-                                        <><LogOut size={18} /> Clock Out</>
+                                        <><LogOut size={18} /> Clock Out — End Shift</>
                                     ) : (
-                                        <><LogIn size={18} /> Clock In</>
+                                        <><LogIn size={18} /> Clock In — Start Shift</>
                                     )}
                                 </button>
                             </div>
+                            {clockedIn && (
+                                <p className="text-xs text-emerald-600/70 font-semibold mt-4 text-center sm:text-left">
+                                    ⏰ Remember to clock out here when your shift ends!
+                                </p>
+                            )}
                         </div>
                     )}
 
